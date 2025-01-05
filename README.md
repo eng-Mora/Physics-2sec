@@ -75,12 +75,25 @@
                 document.querySelector('.login-form').style.display = 'none';
                 videoContainer.style.display = 'block';
                 videos[0].style.display = 'block';
-                videos[1].style.display = 'none';
+                videos[1].style.display = 'block';
+                videos[2].style.display = 'block';
+                videos[3].style.display = 'block';
+                videos[4].style.display = 'none';
+                videos[5].style.display = 'none';
+                videos[6].style.display = 'none';
+                videos[7].style.display = 'none';
+
             } else if (userid === '4545') {
                 document.querySelector('.login-form').style.display = 'none';
                 videoContainer.style.display = 'block';
+                videos[4].style.display = 'block';
+                videos[5].style.display = 'block';
+                videos[6].style.display = 'block';
+                videos[7].style.display = 'block';
                 videos[0].style.display = 'none';
-                videos[1].style.display = 'block';
+                videos[1].style.display = 'none';
+                videos[2].style.display = 'none';
+                videos[3].style.display = 'none';
             } else {
                 alert('Invalid UserID');
             }
@@ -103,10 +116,24 @@
         </section>
 
         <section id="videos">
-            <h2>Embedded Videos</h2>
             <div class="video-container">
-                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Embedded Video 1" frameborder="0" allowfullscreen></iframe>
-                <iframe src="https://www.youtube.com/embed/tgbNymZ7vqY" title="Embedded Video 2" frameborder="0" allowfullscreen></iframe>
+<!ch.1>
+<iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/4491d7b4181be0cfcd/2a86e553435b60bc' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe> 
+<!ch.2>
+<iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/4491d7b4181be1cecd/636e3dd3df1b0486' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+<!ch.3>
+<iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/d391d7b4181be6c25a/d3d20251d3e491f5' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+<!.4>
+<iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/7091d7b4181be5c6f9/3fd0d885574a1845' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+<!ch.5>
+<iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/4491d7b4181beac5cd/3538aa27cf1f4000' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+<!ch.6>
+<iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/d391d7b4181ae1c45a/c9aa840e5bd38aac' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe> 
+<!ch.7>
+<iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/ea91d7b4181bebca63/e6bcfedfa39f3476' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe> 
+<!ch.8>
+<iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/4491d7b4181ae1cfcd/9c2c9da01aef89db' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+
             </div>
         </section>
 
