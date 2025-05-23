@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -223,35 +224,34 @@
         </section>
     </main>
 
-    <script>
-        function checkLogin() {
-            const userid = document.getElementById('userid').value;
-            const videoContainer = document.getElementById('videos');
-            const videos = document.getElementsByClassName('video-container')[0].children;
-            if (userid === '2526') {
-                document.querySelector('.login-form').style.display = 'none';
-                videoContainer.style.display = 'block';
-                videos[0].style.display = 'block';
-                videos[1].style.display = 'block';
-                videos[2].style.display = 'block';
-                videos[3].style.display = 'none';
-                videos[4].style.display = 'none';
-                videos[5].style.display = 'none';
+   <script>
+    const userAccess = {
+        '2526': [0, 1, 2],
+        '4545': [3, 4, 5]
+    };
 
+    function checkLogin() {
+        const userid = document.getElementById('userid').value;
+        const videoContainer = document.getElementById('videos');
+        const videos = document.getElementsByClassName('video-container')[0].children;
 
-            } else if (userid === '4545') {
-                document.querySelector('.login-form').style.display = 'none';
-                videoContainer.style.display = 'block';
-                videos[3].style.display = 'block';
-                videos[4].style.display = 'block';
-                videos[5].style.display = 'block';
-                videos[0].style.display = 'none';
-                videos[1].style.display = 'none';
-                videos[2].style.display = 'none';
+        if (userAccess[userid]) {
+            document.querySelector('.login-form').style.display = 'none';
+            videoContainer.style.display = 'block';
 
-            } else {
-                alert('Invalid UserID');
+            // إخفاء كل الفيديوهات أولاً
+            for (let i = 0; i < videos.length; i++) {
+                videos[i].style.display = 'none';
             }
+
+            // عرض الفيديوهات الخاصة بالمستخدم
+            userAccess[userid].forEach(index => {
+                videos[index].style.display = 'block';
+            });
+        } else {
+            alert('Invalid UserID');
         }
-        console.log('Page loaded successfully');
-    </script>
+    }
+
+    console.log('Page loaded successfully');
+</script>
