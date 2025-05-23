@@ -191,15 +191,19 @@
 
         <section id="videos">
             <div class="video-container">
-                <iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/4491d7b4181be0cfcd/2a86e553435b60bc' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe> 
-                <iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/4491d7b4181be1cecd/636e3dd3df1b0486' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
-                <iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/d391d7b4181be6c25a/d3d20251d3e491f5' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
-                <iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/7091d7b4181be5c6f9/3fd0d885574a1845' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
-                <iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/4491d7b4181beac5cd/3538aa27cf1f4000' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
-                <iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/d391d7b4181ae1c45a/c9aa840e5bd38aac' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe> 
-                <iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/ea91d7b4181bebca63/e6bcfedfa39f3476' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe> 
-                <iframe class='sproutvideo-player' src='https://videos.sproutvideo.com/embed/4491d7b4181ae1cfcd/9c2c9da01aef89db' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
-            </div>
+<iframe class='sproutvideo-player' src='https://drive.google.com/file/d/104O0Ze09-qyZM7tvF8S-te2kvISRIInF/preview' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+                
+<iframe class='sproutvideo-player' src='https://drive.google.com/file/d/1_vCignriEbzrQfl2GgCU4v6ap5sH-keR/preview' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+                
+<iframe class='sproutvideo-player' src='https://drive.google.com/file/d/1difwssUYOy-KPEQd33SpamY9BaEsFo9E/preview' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+                
+<iframe class='sproutvideo-player' src='https://drive.google.com/file/d/1eb-DaMyEkweUjUkYE-09u2YmCkchtM1p/preview' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+                
+<iframe class='sproutvideo-player' src='https://drive.google.com/file/d/1kPfrdbJk3qB33fU2-NfjS-97CkaBS67w/preview' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+                
+<iframe class='sproutvideo-player' src='https://drive.google.com/file/d/1oBf6vUrfXbPL3AZen_VgExzaLH2TLogG/preview' width='640' height='384' frameborder='0' allowfullscreen referrerpolicy='no-referrer-when-downgrade' title='Video Player'></iframe>
+               
+               </div>
             
             <!-- قسم التواصل في قسم الفيديوهات -->
             <div class="contact-section">
@@ -231,23 +235,21 @@
                 videos[0].style.display = 'block';
                 videos[1].style.display = 'block';
                 videos[2].style.display = 'block';
-                videos[3].style.display = 'block';
+                videos[3].style.display = 'none';
                 videos[4].style.display = 'none';
                 videos[5].style.display = 'none';
-                videos[6].style.display = 'none';
-                videos[7].style.display = 'none';
+
 
             } else if (userid === '4545') {
                 document.querySelector('.login-form').style.display = 'none';
                 videoContainer.style.display = 'block';
+                videos[3].style.display = 'block';
                 videos[4].style.display = 'block';
                 videos[5].style.display = 'block';
-                videos[6].style.display = 'block';
-                videos[7].style.display = 'block';
                 videos[0].style.display = 'none';
                 videos[1].style.display = 'none';
                 videos[2].style.display = 'none';
-                videos[3].style.display = 'none';
+
             } else {
                 alert('Invalid UserID');
             }
