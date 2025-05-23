@@ -79,14 +79,21 @@
             color: #2c3e50;
             margin-bottom: 20px;
         }
+        .input-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
         .login-form input {
             width: 100%;
+            max-width: 250px;
             padding: 12px;
-            margin-bottom: 15px;
+            margin: 0 auto;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 16px;
             transition: border-color 0.3s;
+            text-align: center;
         }
         .login-form input:focus {
             border-color: #3498db;
@@ -94,6 +101,7 @@
         }
         .login-form button {
             width: 100%;
+            max-width: 250px;
             padding: 12px;
             background: linear-gradient(135deg, #3498db, #2980b9);
             color: white;
@@ -102,6 +110,8 @@
             font-size: 16px;
             cursor: pointer;
             transition: background 0.3s, transform 0.2s;
+            margin: 0 auto;
+            display: block;
         }
         .login-form button:hover {
             background: linear-gradient(135deg, #2980b9, #2c3e50);
@@ -140,8 +150,7 @@
             color: #000;
             font-size: 28px;
             transition: all 0.2s;
-                margin: 0 10px;
-
+            margin: 0 10px;
         }
         .social-icon:hover {
             opacity: 0.8;
@@ -157,26 +166,26 @@
     <main>
         <section class="login-form">
             <h2>Welcome Back!</h2>
-            <input type="text" id="userid" placeholder="Enter Your UserID">
+            <div class="input-container">
+                <input type="text" id="userid" placeholder="Enter Your UserID">
+            </div>
             <button onclick="checkLogin()">Login</button>
             
             <!-- قسم التواصل في واجهة الدخول -->
             <div class="contact-section">
-                <p class="contact-message">لو واجهتك مشكلة ابعثلي</p>
+                <p class="contact-message">لو واجهتك مشكلة ابعتلي</p>
                 <div class="social-buttons">
-                        <a href="https://www.facebook.com/mamro8529?mibextid=ZbWKwL" target="_blank">
-                            <i class="fab fa-facebook-f social-icon"></i>
-                        </a>
-                    </button>
-                        <a href="https://wa.me/message/5LRM2DVHPZQFM1" target="_blank">
-                            <i class="fab fa-whatsapp social-icon"></i>
-                        </a>
-                    </button>
-                        <a href="http://t.me/Mora_mo1" target="_blank">
-                            <i class="fab fa-telegram-plane social-icon"></i>
-                        </a>
-                    </button>
+                    <a href="https://www.facebook.com/mamro8529?mibextid=ZbWKwL" target="_blank">
+                        <i class="fab fa-facebook-f social-icon"></i>
+                    </a>
+                    <a href="https://wa.me/message/5LRM2DVHPZQFM1" target="_blank">
+                        <i class="fab fa-whatsapp social-icon"></i>
+                    </a>
+                    <a href="http://t.me/Mora_mo1" target="_blank">
+                        <i class="fab fa-telegram-plane social-icon"></i>
+                    </a>
                 </div>
+                <strong>&copy; Developed by Eng: Amr Mohamed</strong>
             </div>
         </section>
 
@@ -194,28 +203,22 @@
             
             <!-- قسم التواصل في قسم الفيديوهات -->
             <div class="contact-section">
-                <p class="contact-message">لو واجهتك مشكلة ابعثلي</p>
+                <p class="contact-message">لو واجهتك مشكلة ابعتلي</p>
                 <div class="social-buttons">
-                        <a href="https://www.facebook.com/mamro8529?mibextid=ZbWKwL" target="_blank">
-                            <i class="fab fa-facebook-f social-icon"></i>
-                        </a>
-                    </button>
-                        <a href="https://wa.me/message/5LRM2DVHPZQFM1" target="_blank">
-                            <i class="fab fa-whatsapp social-icon"></i>
-                        </a>
-                    </button>
-                        <a href="http://t.me/Mora_mo1" target="_blank">
-                            <i class="fab fa-telegram-plane social-icon"></i>
-                        </a>
-                    </button>
+                    <a href="https://www.facebook.com/mamro8529?mibextid=ZbWKwL" target="_blank">
+                        <i class="fab fa-facebook-f social-icon"></i>
+                    </a>
+                    <a href="https://wa.me/message/5LRM2DVHPZQFM1" target="_blank">
+                        <i class="fab fa-whatsapp social-icon"></i>
+                    </a>
+                    <a href="http://t.me/Mora_mo1" target="_blank">
+                        <i class="fab fa-telegram-plane social-icon"></i>
+                    </a>
                 </div>
+                <strong>&copy; Developed by Eng: Amr Mohamed</strong>
             </div>
         </section>
     </main>
-
-    <footer>
-        <p>&copy; Developed by Eng: Amr Mohamed</p>
-    </footer>
 
     <script>
         function checkLogin() {
