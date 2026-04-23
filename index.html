@@ -1,1791 +1,990 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>دومنو أونلاين</title>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0a0f;
-    --surface: #12121a;
-    --surface2: #1a1a28;
-    --surface3: #22223a;
-    --accent: #f0c040;
-    --accent2: #e07820;
-    --accent3: #40d0a0;
-    --text: #f0ece0;
-    --text2: #a098b0;
-    --tile-bg: #f5f0e8;
-    --tile-dot: #1a1020;
-    --tile-border: #d4c890;
-    --red: #e04040;
-    --green: #40c060;
-    --blue: #4080e0;
-    --purple: #9060d0;
-    --glow: rgba(240,192,64,0.15);
-    --radius: 16px;
-    --tile-w: 52px;
-    --tile-h: 26px;
-  }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pit House — كماليات السيارات</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cairo:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --accent:#FF3D00; --accent-gold:#FFB300; --accent-glow:rgba(255,61,0,0.18);
+      --bg:#080808; --bg-card:#0F0F0F; --bg-secondary:#141414; --bg-hover:#1a1a1a;
+      --border:rgba(255,255,255,0.07); --border-hover:rgba(255,61,0,0.3);
+      --text-primary:#F2F2F2; --text-secondary:#999; --text-muted:#4A4A4A;
+      --font-display:'Bebas Neue',sans-serif;
+      --font-ar:'Cairo',sans-serif;
+      --font-mono:'JetBrains Mono',monospace;
+      --radius-sm:8px; --radius-md:14px; --radius-lg:22px;
+      --transition:0.22s ease;
+      --success:#00E676; --danger:#FF1744;
+      --shadow-card:0 4px 24px rgba(0,0,0,0.4);
+      --shadow-hover:0 20px 60px rgba(255,61,0,0.1), 0 8px 32px rgba(0,0,0,0.5);
+    }
+    [data-theme="light"] {
+      --bg:#F5F4F0; --bg-card:#FFFFFF; --bg-secondary:#EBEBEB; --bg-hover:#E0E0E0;
+      --border:rgba(0,0,0,0.09); --border-hover:rgba(255,61,0,0.35);
+      --text-primary:#111111; --text-secondary:#555; --text-muted:#AAA;
+      --shadow-card:0 4px 24px rgba(0,0,0,0.08);
+      --shadow-hover:0 20px 60px rgba(255,61,0,0.12), 0 8px 32px rgba(0,0,0,0.1);
+      --accent-glow:rgba(255,61,0,0.10);
+    }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:var(--font-ar);background:var(--bg);color:var(--text-primary);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
 
-  body {
-    font-family: 'Cairo', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    overflow: hidden;
-    position: relative;
-  }
+    /* ── LOADING SCREEN ── */
+    #loading-screen{
+      position:fixed;inset:0;z-index:99999;
+      background:#080808;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;
+      transition:opacity .6s ease, visibility .6s ease;
+    }
+    #loading-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+    .loading-logo{font-family:var(--font-display);font-size:4rem;letter-spacing:.15em;color:#F2F2F2;line-height:1}
+    .loading-logo span{color:var(--accent)}
+    .car-track{width:300px;height:64px;position:relative;overflow:hidden}
+    .road-line{position:absolute;bottom:10px;left:0;right:0;height:2px;background:rgba(255,255,255,0.06);border-radius:2px}
+    .road-dashes{position:absolute;bottom:10px;left:0;width:200%;height:2px;display:flex;gap:20px;animation:dashMove 0.55s linear infinite}
+    .road-dash{width:28px;height:2px;background:rgba(255,179,0,0.35);border-radius:2px;flex-shrink:0}
+    .car-svg{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);animation:carBounce 0.38s ease-in-out infinite alternate;filter:drop-shadow(0 0 8px rgba(255,61,0,0.4))}
+    @keyframes dashMove{from{transform:translateX(0)}to{transform:translateX(-48px)}}
+    @keyframes carBounce{from{transform:translateX(-50%) translateY(0)}to{transform:translateX(-50%) translateY(-4px)}}
+    .loading-bar-wrap{width:220px;height:3px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden}
+    .loading-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-gold));border-radius:99px;animation:loadBar 2s ease-in-out forwards}
+    @keyframes loadBar{0%{width:0}70%{width:85%}100%{width:100%}}
+    .loading-txt{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.22em;color:#4A4A4A;animation:blink 1.2s ease-in-out infinite}
+    @keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
 
-  /* Background grid */
-  body::before {
-    content:'';
-    position:fixed; inset:0;
-    background-image:
-      linear-gradient(rgba(240,192,64,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(240,192,64,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events:none;
-  }
+    /* ── PAGES ── */
+    .page{display:none;min-height:100vh}
+    .page.active{display:block}
+    #page-success.active{display:flex;align-items:center;justify-content:center}
 
-  body::after {
-    content:'';
-    position:fixed;
-    top:-50%; left:-50%;
-    width:200%; height:200%;
-    background: radial-gradient(ellipse at 30% 20%, rgba(240,192,64,0.06) 0%, transparent 50%),
-                radial-gradient(ellipse at 70% 80%, rgba(64,208,160,0.04) 0%, transparent 50%);
-    pointer-events:none;
-    animation: bgPulse 8s ease-in-out infinite alternate;
-  }
+    /* ── NAVBAR ── */
+    .navbar{position:sticky;top:0;z-index:200;background:rgba(8,8,8,.93);border-bottom:1px solid var(--border);backdrop-filter:blur(24px);transition:background .3s}
+    [data-theme="light"] .navbar{background:rgba(245,244,240,.93)}
+    .nav-inner{max-width:1280px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:66px;gap:1rem}
+    .nav-logo{font-family:var(--font-display);font-size:1.9rem;letter-spacing:.12em;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;gap:.4rem;line-height:1}
+    .nav-logo span{color:var(--accent)}
+    .nav-logo small{font-size:.52rem;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.15em;align-self:flex-end;margin-bottom:.25rem}
+    .nav-actions{display:flex;align-items:center;gap:.75rem}
+    .theme-btn{width:40px;height:40px;border-radius:50%;background:var(--bg-secondary);border:1px solid var(--border);color:var(--text-secondary);font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+    .theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .nav-cart-btn{display:flex;align-items:center;gap:.6rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.5rem 1.1rem;color:var(--text-primary);font-family:var(--font-ar);font-size:.9rem;font-weight:700;cursor:pointer;transition:all var(--transition)}
+    .nav-cart-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--bg-hover)}
+    .cart-count{background:var(--accent);color:#fff;border-radius:99px;padding:.1rem .5rem;font-size:.7rem;font-weight:900;min-width:20px;text-align:center;line-height:1.5;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+    .cart-count.bump{transform:scale(1.5)}
 
-  @keyframes bgPulse {
-    0%   { opacity:0.6; transform:scale(1); }
-    100% { opacity:1;   transform:scale(1.05); }
-  }
+    /* ── HERO ── */
+    .hero{position:relative;overflow:hidden;padding:6rem 1.5rem 5rem;text-align:center;border-bottom:1px solid var(--border)}
+    .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 120% 70% at 50% -10%,rgba(255,61,0,.13) 0%,transparent 60%)}
+    .hero-lines{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:72px 72px;mask-image:radial-gradient(ellipse at center,black 0%,transparent 70%);opacity:.6}
+    .hero-content{position:relative;z-index:1;max-width:760px;margin:0 auto}
+    .hero-eyebrow{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:1.25rem;display:block}
+    .hero-title{font-family:var(--font-display);font-size:clamp(4rem,11vw,8rem);letter-spacing:.05em;line-height:.88;margin-bottom:1.5rem}
+    .hero-title span{color:var(--accent)}
+    .hero-sub{font-size:1.05rem;color:var(--text-secondary);line-height:1.75;max-width:500px;margin:0 auto 2.5rem}
 
-  /* ============ SCREENS ============ */
-  .screen {
-    position:fixed; inset:0;
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    transition: opacity 0.4s, transform 0.4s;
-    z-index:10;
-  }
-  .screen.hidden { opacity:0; pointer-events:none; transform:scale(0.96); }
 
-  /* ============ LOBBY ============ */
-  #lobby {
-    gap: 24px;
-  }
+    /* ── SHOP ── */
+    .shop-container{max-width:1280px;margin:0 auto;padding:3rem 1.5rem}
+    .shop-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+    .shop-title{font-family:var(--font-display);font-size:1.9rem;letter-spacing:.08em;color:var(--text-secondary)}
+    .products-count{font-family:var(--font-mono);font-size:.73rem;color:var(--text-muted);letter-spacing:.1em;background:var(--bg-secondary);border:1px solid var(--border);padding:.3rem .85rem;border-radius:99px}
 
-  .logo {
-    text-align:center;
-    margin-bottom: 8px;
-  }
-  .logo h1 {
-    font-family: 'Tajawal', sans-serif;
-    font-size: clamp(2.8rem, 6vw, 4.5rem);
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent) 100%);
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: shimmer 3s ease-in-out infinite;
-    letter-spacing: -1px;
-    line-height: 1;
-  }
-  .logo .tagline {
-    color: var(--text2);
-    font-size: 0.9rem;
-    margin-top: 6px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-  }
+    .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:1.5rem}
 
-  @keyframes shimmer {
-    0%,100%{ background-position:0% 50%; }
-    50%    { background-position:100% 50%; }
-  }
+    .product-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:all .32s cubic-bezier(.4,0,.2,1);cursor:pointer;position:relative;box-shadow:var(--shadow-card)}
+    .product-card:hover{border-color:var(--border-hover);transform:translateY(-6px);box-shadow:var(--shadow-hover)}
 
-  /* decorative domino tiles in logo */
-  .logo-tiles {
-    display:flex; justify-content:center; gap:8px;
-    margin: 16px 0;
-  }
-  .deco-tile {
-    width:44px; height:22px;
-    background: var(--tile-bg);
-    border-radius: 4px;
-    border: 1px solid var(--tile-border);
-    display:flex; align-items:center; justify-content:space-around;
-    padding: 3px 5px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.8);
-    animation: floatTile 3s ease-in-out infinite;
-  }
-  .deco-tile:nth-child(2) { animation-delay:0.3s; }
-  .deco-tile:nth-child(3) { animation-delay:0.6s; }
-  .deco-tile:nth-child(4) { animation-delay:0.9s; }
-  .deco-tile:nth-child(5) { animation-delay:1.2s; }
-  @keyframes floatTile {
-    0%,100%{ transform:translateY(0); }
-    50%    { transform:translateY(-4px); }
-  }
-  .deco-tile .half { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:2px; width:16px; height:14px; }
-  .deco-tile .dot { width:3px; height:3px; border-radius:50%; background:var(--tile-dot); }
-  .deco-tile .sep { width:1px; height:16px; background:#ccc; }
+    .product-img-wrap{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--bg-secondary)}
+    .product-img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}
+    .product-card:hover .product-img{transform:scale(1.07)}
+    .product-img-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:4.5rem;color:var(--text-muted)}
 
-  /* Card panel */
-  .card {
-    background: var(--surface);
-    border: 1px solid rgba(240,192,64,0.1);
-    border-radius: 24px;
-    padding: 32px 40px;
-    width: min(460px, 95vw);
-    box-shadow: 0 24px 64px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
-    position: relative;
-    overflow: hidden;
-  }
-  .card::before {
-    content:'';
-    position:absolute; top:0; left:0; right:0; height:1px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  }
+    .product-body{padding:1.35rem}
+    .product-name{font-weight:800;font-size:1rem;color:var(--text-primary);margin-bottom:.4rem;line-height:1.4}
+    .product-desc{font-size:.82rem;color:var(--text-muted);margin-bottom:1.1rem;line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .product-footer{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
+    .product-price{font-family:var(--font-display);font-size:1.7rem;color:var(--accent);letter-spacing:.04em;line-height:1}
+    .product-price small{font-family:var(--font-ar);font-size:.72rem;color:var(--text-muted);font-weight:400;margin-right:.2rem}
 
-  .card h2 {
-    font-family:'Tajawal',sans-serif;
-    font-size:1.4rem; font-weight:700;
-    color:var(--accent);
-    margin-bottom:20px;
-    display:flex; align-items:center; gap:8px;
-  }
+    .add-to-cart-btn{display:flex;align-items:center;justify-content:center;gap:.4rem;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:.6rem 1.15rem;font-family:var(--font-ar);font-size:.85rem;font-weight:700;cursor:pointer;transition:all var(--transition);white-space:nowrap;overflow:hidden}
+    .add-to-cart-btn:hover{background:#ff5722;transform:scale(1.04)}
+    .add-to-cart-btn.added{background:var(--success);color:#000}
 
-  .input-group { margin-bottom:16px; }
-  .input-group label { display:block; color:var(--text2); font-size:0.85rem; margin-bottom:6px; }
-  .input-group input, .input-group select {
-    width:100%; padding:12px 16px;
-    background: var(--surface2);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    color: var(--text);
-    font-family:'Cairo',sans-serif;
-    font-size:1rem;
-    outline:none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .input-group input:focus, .input-group select:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(240,192,64,0.1);
-  }
-  .input-group select option { background: var(--surface2); }
+    /* ── SKELETON ── */
+    .skeleton{background:linear-gradient(90deg,var(--bg-secondary) 25%,var(--bg-hover) 50%,var(--bg-secondary) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:var(--radius-sm)}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .skeleton-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+    .skeleton-img{aspect-ratio:4/3;width:100%}
+    .skeleton-body{padding:1.35rem;display:flex;flex-direction:column;gap:.65rem}
+    .skeleton-line{height:13px}
+    .skeleton-line.s{width:55%}
+    .skeleton-line.p{height:22px;width:38%}
 
-  .btn {
-    width:100%; padding:14px;
-    border:none; border-radius:14px;
-    font-family:'Cairo',sans-serif;
-    font-size:1.05rem; font-weight:700;
-    cursor:pointer;
-    transition: all 0.2s;
-    position:relative; overflow:hidden;
-  }
-  .btn::after {
-    content:'';
-    position:absolute; inset:0;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, transparent 100%);
-    pointer-events:none;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
-    color: #1a1000;
-  }
-  .btn-primary:hover { transform:translateY(-2px); box-shadow: 0 8px 24px rgba(240,192,64,0.3); }
-  .btn-secondary {
-    background: var(--surface2);
-    color: var(--text);
-    border: 1px solid rgba(255,255,255,0.08);
-    margin-top:10px;
-  }
-  .btn-secondary:hover { background:var(--surface3); }
-  .btn-danger { background: var(--red); color:#fff; margin-top:10px; }
-  .btn-danger:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(224,64,64,0.3); }
+    /* ── CART ── */
+    .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:999;display:none;backdrop-filter:blur(6px)}
+    .cart-overlay.open{display:block}
+    .cart-drawer{position:fixed;top:0;left:0;bottom:0;width:100%;max-width:430px;background:var(--bg-card);border-right:1px solid var(--border);z-index:1000;transform:translateX(-100%);transition:transform .38s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+    .cart-drawer.open{transform:translateX(0)}
+    .cart-header{padding:1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .cart-title{font-family:var(--font-display);font-size:1.7rem;letter-spacing:.08em}
+    .cart-close{background:none;border:none;color:var(--text-muted);font-size:1.5rem;cursor:pointer;padding:.25rem;transition:color var(--transition);line-height:1}
+    .cart-close:hover{color:var(--accent)}
+    .cart-items{flex:1;overflow-y:auto;padding:1rem}
+    .cart-items::-webkit-scrollbar{width:4px}
+    .cart-items::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--text-muted);gap:.75rem;padding:2rem;text-align:center}
+    .cart-empty-icon{font-size:3.5rem}
+    .cart-item{display:grid;grid-template-columns:68px 1fr auto;gap:.8rem;align-items:center;padding:1rem;background:var(--bg-secondary);border-radius:var(--radius-sm);margin-bottom:.6rem;border:1px solid var(--border);transition:border-color var(--transition)}
+    .cart-item:hover{border-color:var(--border-hover)}
+    .cart-item-img{width:68px;height:68px;border-radius:8px;object-fit:cover;background:var(--bg)}
+    .cart-item-name{font-weight:700;font-size:.9rem;margin-bottom:.2rem;line-height:1.35}
+    .cart-item-price{font-family:var(--font-display);font-size:1.15rem;color:var(--accent)}
+    .cart-qty{display:flex;align-items:center;gap:.5rem;margin-top:.45rem}
+    .qty-btn{width:28px;height:28px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--text-primary);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+    .qty-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .qty-val{font-family:var(--font-mono);font-size:.9rem;min-width:22px;text-align:center}
+    .remove-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1.1rem;padding:.3rem;transition:color var(--transition)}
+    .remove-btn:hover{color:var(--danger)}
+    .cart-footer{padding:1.35rem;border-top:1px solid var(--border)}
+    .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.1rem}
+    .cart-total-label{font-weight:700;font-size:.9rem;color:var(--text-secondary)}
+    .cart-total-val{font-family:var(--font-display);font-size:2rem;color:var(--accent)}
+    .checkout-btn{width:100%;padding:.95rem;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);font-family:var(--font-ar);font-size:1rem;font-weight:900;cursor:pointer;transition:all var(--transition)}
+    .checkout-btn:hover{background:#ff5722;transform:translateY(-1px)}
+    .checkout-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
 
-  .divider {
-    display:flex; align-items:center; gap:12px;
-    color:var(--text2); font-size:0.8rem; margin:16px 0;
-  }
-  .divider::before, .divider::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.07); }
+    /* ── CHECKOUT ── */
+    .checkout-container{max-width:700px;margin:0 auto;padding:3rem 1.5rem}
+    .checkout-title{font-family:var(--font-display);font-size:2.8rem;letter-spacing:.08em;margin-bottom:.3rem}
+    .checkout-subtitle{color:var(--text-muted);font-size:.9rem;margin-bottom:2.5rem}
+    .checkout-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.85rem;margin-bottom:1.5rem}
+    .checkout-section-title{font-family:var(--font-display);font-size:1.15rem;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:1.35rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+    .form-group{margin-bottom:1.15rem}
+    .form-label{display:block;font-size:.8rem;font-weight:700;color:var(--text-muted);margin-bottom:.45rem;letter-spacing:.04em}
+    .form-control{width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-ar);font-size:.95rem;padding:.8rem 1rem;outline:none;transition:border-color var(--transition),box-shadow var(--transition)}
+    .form-control:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(255,61,0,.08)}
+    .form-control::placeholder{color:var(--text-muted)}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .form-group.has-error .form-control{border-color:var(--danger)}
+    .form-error{display:none;font-size:.75rem;color:var(--danger);margin-top:.3rem}
+    .form-group.has-error .form-error{display:block}
+    .order-summary-item{display:flex;justify-content:space-between;align-items:center;padding:.65rem 0;border-bottom:1px solid var(--border);font-size:.9rem}
+    .order-summary-item:last-of-type{border-bottom:none}
+    .order-summary-item .name{color:var(--text-secondary)}
+    .order-summary-item .price{font-family:var(--font-display);color:var(--accent);font-size:1.1rem}
+    .order-total-row{display:flex;justify-content:space-between;align-items:center;padding-top:1rem;margin-top:.5rem;border-top:2px solid var(--border)}
+    .order-total-label{font-weight:900;font-size:1rem}
+    .order-total-val{font-family:var(--font-display);font-size:2.1rem;color:var(--accent)}
+    .cod-badge{display:flex;align-items:center;gap:.85rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;color:var(--text-secondary);font-size:.88rem;font-weight:600}
+    .cod-icon{font-size:1.8rem}
+    .place-order-btn{width:100%;padding:1.15rem;background:var(--accent);color:#fff;border:none;border-radius:var(--radius-md);font-family:var(--font-ar);font-size:1.05rem;font-weight:900;cursor:pointer;transition:all var(--transition);margin-top:1.5rem}
+    .place-order-btn:hover{background:#ff5722;transform:translateY(-2px);box-shadow:0 8px 32px rgba(255,61,0,.25)}
+    .place-order-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+    .back-link{display:inline-flex;align-items:center;gap:.4rem;color:var(--text-muted);font-size:.85rem;cursor:pointer;margin-bottom:1.75rem;transition:color var(--transition)}
+    .back-link:hover{color:var(--accent)}
 
-  .room-id-display {
-    background: var(--surface2);
-    border: 1px dashed rgba(240,192,64,0.3);
-    border-radius:12px; padding:12px 16px;
-    display:flex; align-items:center; justify-content:space-between;
-    margin-bottom:16px;
-  }
-  .room-id-display .rid { font-family:monospace; font-size:1.2rem; color:var(--accent); letter-spacing:4px; }
-  .copy-btn { background:none; border:none; color:var(--text2); cursor:pointer; font-size:1.1rem; padding:4px; }
-  .copy-btn:hover { color:var(--accent); }
+    /* ── SUCCESS ── */
+    #page-success{min-height:100vh;text-align:center;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(0,230,118,.07) 0%,transparent 60%)}
+    .success-card{max-width:520px;padding:3.5rem 2rem}
+    .success-icon{font-size:4.5rem;margin-bottom:1.5rem;display:block;animation:bounceIn .6s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes bounceIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
+    .success-title{font-family:var(--font-display);font-size:3.2rem;letter-spacing:.08em;margin-bottom:.75rem}
+    .success-title span{color:var(--success)}
+    .success-sub{color:var(--text-secondary);font-size:1rem;line-height:1.8;margin-bottom:.5rem}
+    .success-order-id{font-family:var(--font-mono);font-size:.78rem;color:var(--text-muted);margin-bottom:2.5rem;padding:.5rem 1rem;background:var(--bg-secondary);border-radius:var(--radius-sm);display:inline-block;margin-top:.5rem}
+    .continue-btn{background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:.9rem 2.2rem;font-family:var(--font-ar);font-size:1rem;font-weight:700;cursor:pointer;transition:all var(--transition)}
+    .continue-btn:hover{background:#ff5722;transform:translateY(-1px)}
 
-  .status-msg {
-    text-align:center; color:var(--text2); font-size:0.85rem;
-    padding:8px; min-height:30px;
-  }
-  .status-msg.ok { color:var(--green); }
-  .status-msg.err { color:var(--red); }
-  .status-msg.loading::after { content:'...'; animation: dots 1s steps(3) infinite; }
-  @keyframes dots { 0%{content:'.'} 33%{content:'..'} 66%{content:'...'} }
+    /* ── TOAST ── */
+    #toast-container{position:fixed;bottom:1.75rem;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;align-items:center;gap:.5rem;pointer-events:none}
+    .toast{background:var(--bg-card);border:1px solid var(--border);border-radius:99px;padding:.75rem 1.6rem;font-size:.88rem;font-weight:700;box-shadow:0 8px 40px rgba(0,0,0,.6);animation:toastUp .3s cubic-bezier(.34,1.56,.64,1);white-space:nowrap}
+    @keyframes toastUp{from{opacity:0;transform:translateY(16px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .toast.success{border-color:var(--success);color:var(--success)}
+    .toast.error{border-color:var(--danger);color:var(--danger)}
+    .toast.info{border-color:var(--accent-gold);color:var(--accent-gold)}
 
-  .tabs { display:flex; gap:8px; margin-bottom:20px; }
-  .tab {
-    flex:1; padding:10px; border:none; border-radius:10px;
-    font-family:'Cairo',sans-serif; font-weight:600; cursor:pointer;
-    background:var(--surface2); color:var(--text2);
-    transition:all 0.2s;
-  }
-  .tab.active { background:var(--accent); color:#1a1000; }
+    /* ── SPINNER ── */
+    #page-spinner{position:fixed;inset:0;background:rgba(8,8,8,.85);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:1rem;backdrop-filter:blur(6px)}
+    #page-spinner.show{display:flex}
+    .spinner-ring{width:46px;height:46px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .spinner-txt{font-family:var(--font-mono);font-size:.78rem;color:var(--text-muted);letter-spacing:.12em}
 
-  /* ============ WAITING ROOM ============ */
-  #waiting { gap:20px; }
-  .players-list {
-    display:flex; flex-direction:column; gap:10px; margin:16px 0;
-  }
-  .player-slot {
-    display:flex; align-items:center; gap:12px;
-    padding:12px 16px;
-    background:var(--surface2); border-radius:12px;
-    border:1px solid rgba(255,255,255,0.05);
-    transition:all 0.3s;
-  }
-  .player-slot.filled { border-color:rgba(240,192,64,0.2); }
-  .player-slot.me { border-color:rgba(64,208,160,0.3); }
-  .player-avatar {
-    width:36px; height:36px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    font-size:1.2rem;
-    background:var(--surface3);
-  }
-  .player-slot.filled .player-avatar { background:linear-gradient(135deg, var(--accent), var(--accent2)); }
-  .player-slot.me    .player-avatar { background:linear-gradient(135deg, var(--accent3), #4080e0); }
-  .player-name { flex:1; font-weight:600; }
-  .player-badge { font-size:0.72rem; padding:2px 8px; border-radius:20px; background:var(--surface3); color:var(--text2); }
-  .player-badge.host { background:rgba(240,192,64,0.15); color:var(--accent); }
-  .player-badge.you  { background:rgba(64,208,160,0.15); color:var(--accent3); }
+    /* ── EMPTY ── */
+    .empty-state{text-align:center;padding:5rem 2rem;color:var(--text-muted)}
+    .empty-state-icon{font-size:3.5rem;margin-bottom:1rem}
+    .empty-state h3{font-family:var(--font-display);font-size:2.2rem;margin-bottom:.5rem;color:var(--text-secondary)}
 
-  .rule-select { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0; }
-  .rule-btn {
-    padding:6px 14px; border-radius:20px; border:1px solid rgba(255,255,255,0.1);
-    background:var(--surface2); color:var(--text2); cursor:pointer; font-size:0.8rem;
-    font-family:'Cairo',sans-serif; transition:all 0.2s;
-  }
-  .rule-btn.on { background:rgba(240,192,64,0.15); color:var(--accent); border-color:rgba(240,192,64,0.3); }
+    @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 
-  /* ============ GAME SCREEN ============ */
-  #game {
-    position:fixed; inset:0;
-    display:flex; flex-direction:column;
-    background:var(--bg);
-    z-index:5;
-  }
+    /* ── AUTH MODAL ── */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9000;padding:1rem;backdrop-filter:blur(10px)}
+    .modal-backdrop.hidden{display:none}
+    .auth-modal{background:var(--bg-card);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:22px;padding:2.25rem;width:100%;max-width:400px;animation:slideUp .4s cubic-bezier(.34,1.56,.64,1);position:relative}
+    @keyframes slideUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+    .auth-modal-close{position:absolute;top:1rem;left:1rem;background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1;padding:.2rem}
+    .auth-modal-close:hover{color:var(--accent)}
+    .auth-tabs{display:flex;gap:.5rem;margin-bottom:1.75rem;background:var(--bg-secondary);border-radius:var(--radius-sm);padding:.25rem}
+    .auth-tab{flex:1;padding:.6rem;border:none;background:none;color:var(--text-muted);font-family:var(--font-ar);font-size:.88rem;font-weight:700;cursor:pointer;border-radius:6px;transition:all var(--transition)}
+    .auth-tab.active{background:var(--accent);color:#fff}
+    .auth-form{display:none}.auth-form.active{display:block}
+    .auth-logo{font-family:var(--font-display);font-size:2rem;letter-spacing:.1em;text-align:center;margin-bottom:.2rem}
+    .auth-logo span{color:var(--accent)}
+    .auth-badge{text-align:center;color:var(--text-muted);font-size:.78rem;margin-bottom:1.5rem}
+    .auth-error{color:var(--danger);font-size:.8rem;margin-top:.5rem;text-align:center;min-height:1.2em}
 
-  /* Top bar */
-  .game-topbar {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:10px 20px;
-    background:var(--surface);
-    border-bottom:1px solid rgba(255,255,255,0.05);
-    z-index:20; flex-shrink:0;
-  }
-  .game-topbar .gametitle {
-    font-family:'Tajawal',sans-serif;
-    font-weight:900; font-size:1.1rem;
-    color:var(--accent);
-  }
-  .scores-bar { display:flex; gap:20px; }
-  .score-chip {
-    display:flex; align-items:center; gap:6px;
-    padding:4px 12px; border-radius:20px;
-    background:var(--surface2); font-size:0.85rem;
-  }
-  .score-chip .sc-name { color:var(--text2); }
-  .score-chip .sc-val { font-weight:700; color:var(--accent); }
-  .score-chip.active { background:rgba(240,192,64,0.15); border:1px solid rgba(240,192,64,0.3); }
+    /* ── NAV USER ── */
+    .nav-user-btn{display:flex;align-items:center;gap:.5rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:.5rem 1rem;color:var(--text-primary);font-family:var(--font-ar);font-size:.85rem;font-weight:700;cursor:pointer;transition:all var(--transition)}
+    .nav-user-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:900;color:#fff;flex-shrink:0}
 
-  /* Board area */
-  .game-board-wrap {
-    flex:1; position:relative; overflow:hidden;
-  }
-  #board-canvas {
-    position:absolute; inset:0;
-    width:100%; height:100%;
-  }
+    /* ── PROFILE DROPDOWN ── */
+    .profile-dropdown-wrap{position:relative}
+    .profile-dropdown{position:absolute;top:calc(100% + .5rem);left:0;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:.5rem;min-width:200px;z-index:500;box-shadow:0 12px 40px rgba(0,0,0,.5);animation:fadeUp .2s ease}
+    .profile-dropdown.hidden{display:none}
+    .dropdown-user-info{padding:.75rem 1rem;border-bottom:1px solid var(--border);margin-bottom:.4rem}
+    .dropdown-user-name{font-weight:800;font-size:.9rem;margin-bottom:.2rem}
+    .dropdown-user-email{font-size:.75rem;color:var(--text-muted)}
+    .dropdown-item{display:flex;align-items:center;gap:.65rem;padding:.65rem 1rem;border-radius:var(--radius-sm);color:var(--text-secondary);font-size:.88rem;font-weight:600;cursor:pointer;transition:all var(--transition);border:none;background:none;width:100%;text-align:right}
+    .dropdown-item:hover{background:var(--bg-secondary);color:var(--text-primary)}
+    .dropdown-item.danger{color:var(--danger)}
+    .dropdown-item.danger:hover{background:rgba(255,23,68,.08)}
 
-  /* Hand area */
-  .hand-area {
-    background:var(--surface);
-    border-top:1px solid rgba(255,255,255,0.06);
-    padding:12px 16px 16px;
-    flex-shrink:0;
-  }
-  .hand-label {
-    font-size:0.75rem; color:var(--text2); margin-bottom:8px;
-    display:flex; justify-content:space-between;
-  }
-  .hand-tiles {
-    display:flex; gap:8px; overflow-x:auto; padding:4px 0;
-    align-items:center; min-height:68px;
-    scrollbar-width:thin; scrollbar-color:var(--surface3) transparent;
-  }
-  .hand-tiles::-webkit-scrollbar { height:4px; }
-  .hand-tiles::-webkit-scrollbar-thumb { background:var(--surface3); border-radius:2px; }
+    /* ── PROFILE PAGE ── */
+    .profile-container{max-width:600px;margin:0 auto;padding:3rem 1.5rem}
+    .profile-header-card{background:var(--bg-card);border:1px solid var(--border);border-top:3px solid var(--accent);border-radius:var(--radius-lg);padding:2rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:1.5rem}
+    .profile-avatar-lg{width:72px;height:72px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;color:#fff;flex-shrink:0}
+    .profile-section{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.5rem}
+    .profile-section-title{font-family:var(--font-display);font-size:1.1rem;letter-spacing:.08em;color:var(--text-secondary);margin-bottom:1.25rem;padding-bottom:.75rem;border-bottom:1px solid var(--border)}
+    .saved-address-item{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;margin-bottom:.6rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;cursor:pointer;transition:border-color var(--transition)}
+    .saved-address-item:hover{border-color:var(--accent)}
+    .saved-address-item.selected{border-color:var(--accent);background:rgba(255,61,0,.05)}
+    .address-label{font-weight:700;font-size:.88rem;margin-bottom:.25rem}
+    .address-text{font-size:.8rem;color:var(--text-muted)}
+    .address-select-dot{width:18px;height:18px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+    .saved-address-item.selected .address-select-dot{border-color:var(--accent);background:var(--accent)}
 
-  /* DOM Tile */
-  .tile {
-    position:relative;
-    display:flex;
-    flex-direction:row;
-    align-items:center;
-    background: var(--tile-bg);
-    border: 1.5px solid var(--tile-border);
-    border-radius: 6px;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.9);
-    cursor:pointer;
-    transition: all 0.18s;
-    flex-shrink:0;
-    user-select:none;
-    -webkit-user-select:none;
-  }
-  .tile:hover { transform:translateY(-8px) scale(1.06); box-shadow:0 12px 28px rgba(240,192,64,0.35); border-color:var(--accent); z-index:10; }
-  .tile.selected { transform:translateY(-14px); box-shadow:0 16px 32px rgba(240,192,64,0.5); border-color:var(--accent); z-index:11; }
-  .tile.playable { animation: tilePulse 1.2s ease-in-out infinite; }
-  @keyframes tilePulse {
-    0%,100%{ box-shadow:0 3px 10px rgba(0,0,0,0.5), 0 0 0 0 rgba(240,192,64,0); }
-    50%    { box-shadow:0 3px 10px rgba(0,0,0,0.5), 0 0 0 6px rgba(240,192,64,0.3); }
-  }
-  .tile.disabled { opacity:0.45; cursor:not-allowed; }
-  .tile.disabled:hover { transform:none; box-shadow:0 3px 10px rgba(0,0,0,0.5); border-color:var(--tile-border); }
+    /* ── PROMO ── */
+    .promo-section{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:1rem 1.25rem;margin-bottom:1rem}
+    .promo-input-row{display:flex;gap:.6rem}
+    .promo-input-row .form-control{flex:1}
+    .promo-apply-btn{padding:.8rem 1.25rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text-primary);font-family:var(--font-ar);font-size:.88rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all var(--transition)}
+    .promo-apply-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .promo-result{margin-top:.65rem;font-size:.85rem;font-weight:700;min-height:1.4em}
+    .promo-result.success{color:var(--success)}
+    .promo-result.error{color:var(--danger)}
+    .discount-row{display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.9rem;color:var(--success)}
 
-  .tile-half {
-    width:26px; height:50px;
-    display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
-    gap:4px; flex-shrink:0;
-  }
-  .tile-sep {
-    width:1.5px; height:46px;
-    background:rgba(0,0,0,0.15);
-    flex-shrink:0;
-  }
-  .dot {
-    width:5px; height:5px;
-    border-radius:50%;
-    background:var(--tile-dot);
-    flex-shrink:0;
-  }
-
-  /* Action bar */
-  .action-bar {
-    display:flex; gap:10px; justify-content:center;
-    padding:8px 16px 0;
-  }
-  .action-btn {
-    padding:8px 20px; border-radius:20px; border:none;
-    font-family:'Cairo',sans-serif; font-weight:600; font-size:0.9rem;
-    cursor:pointer; transition:all 0.2s;
-  }
-  .action-btn.draw {
-    background:rgba(64,128,224,0.15); color:#6090e0;
-    border:1px solid rgba(64,128,224,0.3);
-  }
-  .action-btn.draw:hover { background:rgba(64,128,224,0.25); }
-  .action-btn.pass {
-    background:rgba(224,64,64,0.1); color:#e06060;
-    border:1px solid rgba(224,64,64,0.2);
-  }
-  .action-btn.pass:hover { background:rgba(224,64,64,0.2); }
-  .action-btn:disabled { opacity:0.35; cursor:not-allowed; }
-
-  /* Turn indicator */
-  .turn-indicator {
-    text-align:center; padding:6px;
-    font-size:0.8rem; font-weight:600;
-    color:var(--text2);
-  }
-  .turn-indicator span { color:var(--accent); }
-
-  /* Opponents */
-  .opponents-bar {
-    display:flex; justify-content:space-around;
-    padding:8px 16px;
-    background:var(--surface);
-    border-bottom:1px solid rgba(255,255,255,0.05);
-    flex-shrink:0;
-  }
-  .opponent-chip {
-    display:flex; align-items:center; gap:8px;
-    padding:6px 14px; border-radius:20px;
-    background:var(--surface2);
-    font-size:0.82rem;
-    transition:all 0.3s;
-  }
-  .opponent-chip.active-turn {
-    background:rgba(240,192,64,0.15);
-    border:1px solid rgba(240,192,64,0.3);
-    box-shadow:0 0 20px rgba(240,192,64,0.1);
-  }
-  .opp-name { font-weight:600; }
-  .opp-count { color:var(--text2); }
-  .opp-tiles-back {
-    display:flex; gap:2px;
-  }
-  .tile-back {
-    width:14px; height:28px; border-radius:3px;
-    background:linear-gradient(135deg,#2a4060,#1a2840);
-    border:1px solid rgba(255,255,255,0.1);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,0.05);
-  }
-
-  /* Toast */
-  .toast {
-    position:fixed; top:80px; left:50%; transform:translateX(-50%) translateY(-20px);
-    background:var(--surface); border:1px solid rgba(240,192,64,0.2);
-    border-radius:12px; padding:10px 20px;
-    font-size:0.9rem; color:var(--text);
-    box-shadow:0 8px 24px rgba(0,0,0,0.4);
-    z-index:100; opacity:0;
-    transition: all 0.3s;
-    pointer-events:none; white-space:nowrap;
-  }
-  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
-  .toast.win  { border-color:var(--accent); color:var(--accent); }
-  .toast.lose { border-color:var(--red); color:var(--red); }
-
-  /* End screen overlay */
-  #end-overlay {
-    position:fixed; inset:0;
-    background:rgba(0,0,0,0.75);
-    display:flex; align-items:center; justify-content:center;
-    z-index:50; opacity:0; pointer-events:none;
-    transition:opacity 0.5s;
-    backdrop-filter:blur(8px);
-  }
-  #end-overlay.show { opacity:1; pointer-events:all; }
-  .end-card {
-    background:var(--surface);
-    border:1px solid rgba(240,192,64,0.2);
-    border-radius:24px; padding:40px;
-    text-align:center; max-width:380px;
-    box-shadow:0 32px 80px rgba(0,0,0,0.6);
-    animation:popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes popIn {
-    0%  { transform:scale(0.7); opacity:0; }
-    100%{ transform:scale(1);   opacity:1; }
-  }
-  .end-emoji { font-size:4rem; margin-bottom:12px; }
-  .end-title {
-    font-family:'Tajawal',sans-serif; font-size:2rem; font-weight:900;
-    margin-bottom:8px;
-  }
-  .end-title.win  { color:var(--accent); }
-  .end-title.lose { color:var(--red); }
-  .end-scores { margin:16px 0; }
-  .end-score-row {
-    display:flex; justify-content:space-between;
-    padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);
-    font-size:0.9rem;
-  }
-
-  /* Info panel */
-  .info-pill {
-    position:fixed; bottom:200px; right:20px;
-    background:var(--surface); border:1px solid rgba(255,255,255,0.07);
-    border-radius:12px; padding:8px 14px;
-    font-size:0.75rem; color:var(--text2);
-    box-shadow:0 4px 16px rgba(0,0,0,0.4);
-    z-index:15;
-  }
-  .info-pill strong { color:var(--accent); }
-
-  /* Rules popup */
-  .rules-popup {
-    position:fixed; inset:0;
-    background:rgba(0,0,0,0.8);
-    display:flex; align-items:center; justify-content:center;
-    z-index:60; opacity:0; pointer-events:none; transition:opacity 0.3s;
-    backdrop-filter:blur(6px);
-  }
-  .rules-popup.show { opacity:1; pointer-events:all; }
-  .rules-box {
-    background:var(--surface); border:1px solid rgba(240,192,64,0.2);
-    border-radius:20px; padding:30px 36px;
-    max-width:480px; width:90vw;
-    max-height:80vh; overflow-y:auto;
-    box-shadow:0 24px 64px rgba(0,0,0,0.6);
-  }
-  .rules-box h3 {
-    font-family:'Tajawal',sans-serif; font-size:1.6rem; color:var(--accent);
-    margin-bottom:16px;
-  }
-  .rules-box h4 { color:var(--accent2); margin:14px 0 6px; }
-  .rules-box p, .rules-box li { color:var(--text2); line-height:1.7; font-size:0.88rem; }
-  .rules-box ul { padding-right:18px; }
-
-  /* Connection badge */
-  .conn-badge {
-    display:flex; align-items:center; gap:5px;
-    font-size:0.75rem;
-  }
-  .conn-dot {
-    width:7px; height:7px; border-radius:50%;
-    background:var(--text2);
-    transition:background 0.3s;
-  }
-  .conn-dot.connected { background:var(--green); box-shadow:0 0 6px var(--green); }
-  .conn-dot.connecting { background:var(--accent); animation:blink 0.8s ease-in-out infinite; }
-  .conn-dot.error { background:var(--red); }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  /* Mobile adjustments */
-  @media(max-width:600px) {
-    .card { padding:24px 20px; }
-    .game-topbar { padding:8px 12px; }
-    .scores-bar { gap:10px; }
-    .score-chip { padding:3px 8px; font-size:0.78rem; }
-    :root { --tile-w:46px; --tile-h:22px; }
-    .tile-half { width:22px; height:44px; }
-  }
-</style>
+    @media(max-width:640px){
+      .hero-title{font-size:3.2rem}
+      .form-row{grid-template-columns:1fr}
+      .cart-drawer{max-width:100%}
+      .profile-header-card{flex-direction:column;text-align:center}
+    }
+  </style>
 </head>
 <body>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+<!-- ══ LOADING SCREEN ══ -->
+<div id="loading-screen">
+  <div class="loading-logo">PIT <span>HOUSE</span></div>
+  <div class="car-track">
+    <div class="road-line"></div>
+    <div class="road-dashes">
+      <div class="road-dash"></div><div class="road-dash"></div><div class="road-dash"></div>
+      <div class="road-dash"></div><div class="road-dash"></div><div class="road-dash"></div>
+      <div class="road-dash"></div><div class="road-dash"></div><div class="road-dash"></div>
+      <div class="road-dash"></div><div class="road-dash"></div><div class="road-dash"></div>
+    </div>
+    <svg class="car-svg" width="82" height="38" viewBox="0 0 82 38" fill="none">
+      <rect x="4" y="18" width="74" height="14" rx="5" fill="#1e1e1e"/>
+      <path d="M18 18 C22 7, 31 5, 41 5 C51 5, 60 7, 64 18Z" fill="#161616"/>
+      <path d="M22 18 C26 9, 32 8, 40 8 C48 8, 54 9, 58 18Z" fill="#FF3D00" opacity=".45"/>
+      <circle cx="19" cy="32" r="6" fill="#2a2a2a"/><circle cx="19" cy="32" r="3" fill="#444"/>
+      <circle cx="63" cy="32" r="6" fill="#2a2a2a"/><circle cx="63" cy="32" r="3" fill="#444"/>
+      <rect x="75" y="21" width="5" height="4" rx="2" fill="#FFB300" opacity=".9"/>
+      <rect x="2" y="21" width="4" height="4" rx="2" fill="#FF3D00" opacity=".8"/>
+    </svg>
+  </div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+  <div class="loading-txt">جاري تحميل المنتجات...</div>
+</div>
 
-<!-- Rules Popup -->
-<div class="rules-popup" id="rulesPopup">
-  <div class="rules-box">
-    <h3>📋 قواعد الدومنو</h3>
-    <h4>🎯 الهدف</h4>
-    <p>التخلص من جميع القطع في يدك قبل الخصم. أول لاعب ينهي قطعه يفوز بالجولة ويجمع نقاط الخصم المتبقية.</p>
-    <h4>🃏 توزيع القطع</h4>
-    <ul>
-      <li>المجموعة تحتوي على 28 قطعة (من 0-0 إلى 6-6)</li>
-      <li>كل لاعب يأخذ 7 قطع في البداية</li>
-      <li>الباقي يبقى في "المخزون"</li>
-    </ul>
-    <h4>▶️ سير اللعبة</h4>
-    <ul>
-      <li>من يملك [6-6] يبدأ اللعبة، وإن لم يوجد فمن يملك أعلى دبل</li>
-      <li>كل لاعب يضع قطعة تتطابق مع أحد طرفي السلسلة</li>
-      <li>الدبل (مثل 3-3) يُوضع عرضياً</li>
-      <li>إذا لم تجد قطعة مناسبة، اسحب من المخزون</li>
-      <li>إذا فرغ المخزون ولم تجد قطعة، "باص"</li>
-    </ul>
-    <h4>🏆 الفوز والنقاط</h4>
-    <ul>
-      <li>اللاعب الذي ينهي قطعه يفوز بالجولة</li>
-      <li>إذا أغلق البورد (لا أحد يستطيع اللعب): الفائز من لديه أقل نقاط</li>
-      <li>نقاط الجولة = مجموع نقاط الخصوم المتبقية</li>
-      <li>الفوز بالمباراة عند الوصول لـ 100 نقطة أو أكثر</li>
-    </ul>
-    <h4>💡 أنواع اللعب</h4>
-    <ul>
-      <li><strong>عادي</strong>: السلسلة في اتجاه واحد</li>
-      <li><strong>4 اتجاهات</strong>: الدبل الأول يفتح 4 اتجاهات</li>
-    </ul>
-    <br>
-    <button class="btn btn-primary" onclick="document.getElementById('rulesPopup').classList.remove('show')">فهمت! 👍</button>
+<!-- ══ SHOP PAGE ══ -->
+<div id="page-shop" class="page active">
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo">PIT <span>HOUSE</span> <small>SHOP</small></div>
+      <div class="nav-actions">
+        <button class="theme-btn" id="theme-btn" onclick="toggleTheme()">🌙</button>
+        <div id="nav-auth-guest">
+          <button class="nav-user-btn" onclick="openAuthModal()">👤 تسجيل الدخول</button>
+        </div>
+        <div id="nav-auth-user" class="profile-dropdown-wrap" style="display:none">
+          <button class="nav-user-btn" onclick="toggleProfileDropdown()">
+            <div class="user-avatar" id="nav-avatar">؟</div>
+            <span id="nav-username">...</span>
+          </button>
+          <div class="profile-dropdown hidden" id="profile-dropdown">
+            <div class="dropdown-user-info">
+              <div class="dropdown-user-name" id="dd-name">—</div>
+              <div class="dropdown-user-email" id="dd-email">—</div>
+            </div>
+            <button class="dropdown-item" onclick="showProfile();toggleProfileDropdown()">📋 حسابي وعناويني</button>
+            <button class="dropdown-item danger" onclick="doLogout()">🚪 تسجيل الخروج</button>
+          </div>
+        </div>
+        <button class="nav-cart-btn" onclick="openCart()">
+          🛒 السلة <span class="cart-count" id="cart-count">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-lines"></div>
+    <div class="hero-content">
+      <span class="hero-eyebrow">⚡ كماليات وإكسسوارات السيارات</span>
+      <h1 class="hero-title">PIT<br/><span>HOUSE</span></h1>
+      <p class="hero-sub">كل اللي سيارتك محتاجه من ليد وسمعات وإكسسوارات — بأفضل الجودة وأحسن الأسعار</p>
+    </div>
+  </section>
+
+  <div class="shop-container">
+    <div class="shop-header">
+      <h2 class="shop-title">المنتجات</h2>
+      <span class="products-count" id="products-count">جاري التحميل...</span>
+    </div>
+    <div class="products-grid" id="products-grid">
+      <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line s"></div><div class="skeleton skeleton-line p"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line s"></div><div class="skeleton skeleton-line p"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line s"></div><div class="skeleton skeleton-line p"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton skeleton-img"></div><div class="skeleton-body"><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line s"></div><div class="skeleton skeleton-line p"></div></div></div>
+    </div>
   </div>
 </div>
 
-<!-- End overlay -->
-<div id="end-overlay">
-  <div class="end-card">
-    <div class="end-emoji" id="end-emoji">🏆</div>
-    <div class="end-title" id="end-title">فزت!</div>
-    <div class="end-scores" id="end-scores"></div>
-    <button class="btn btn-primary" id="playAgainBtn">العب مرة ثانية</button>
-    <button class="btn btn-secondary" id="backLobbyBtn">الرجوع للقائمة</button>
+<!-- ══ CHECKOUT PAGE ══ -->
+<div id="page-checkout" class="page">
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo">PIT <span>HOUSE</span> <small>SHOP</small></div>
+      <div class="nav-actions">
+        <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+        <button class="nav-cart-btn" onclick="showShop()">← رجوع</button>
+      </div>
+    </div>
+  </nav>
+  <div class="checkout-container">
+    <div class="back-link" onclick="showShop()">← رجوع للمنتجات</div>
+    <h1 class="checkout-title">إتمام الطلب</h1>
+    <p class="checkout-subtitle">ادخل بياناتك وهنوصلك في أقرب وقت</p>
+
+    <div class="checkout-section">
+      <div class="checkout-section-title">👤 بيانات العميل</div>
+      <div id="saved-addresses-wrap" style="display:none;margin-bottom:1.25rem">
+        <div style="font-size:.82rem;font-weight:700;color:var(--text-muted);margin-bottom:.65rem">📍 عناوينك المحفوظة</div>
+        <div id="saved-addresses-list"></div>
+        <div style="margin-top:.5rem;margin-bottom:.75rem;text-align:center;font-size:.78rem;color:var(--text-muted)">— أو ادخل عنوان جديد —</div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" id="fg-name">
+          <label class="form-label">الاسم بالكامل *</label>
+          <input type="text" class="form-control" id="c-name" placeholder="مثال: محمد أحمد"/>
+          <span class="form-error">من فضلك ادخل اسمك</span>
+        </div>
+        <div class="form-group" id="fg-phone">
+          <label class="form-label">رقم الموبايل *</label>
+          <input type="tel" class="form-control" id="c-phone" placeholder="01xxxxxxxxx"/>
+          <span class="form-error">ادخل رقم موبايل صحيح</span>
+        </div>
+      </div>
+      <div class="form-group" id="fg-address">
+        <label class="form-label">العنوان بالتفصيل *</label>
+        <input type="text" class="form-control" id="c-address" placeholder="المحافظة، المدينة، الشارع، رقم المنزل"/>
+        <span class="form-error">من فضلك ادخل عنوانك</span>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ملاحظات إضافية (اختياري)</label>
+        <input type="text" class="form-control" id="c-notes" placeholder="أي تعليمات للتوصيل..."/>
+      </div>
+    </div>
+
+    <div class="checkout-section">
+      <div class="checkout-section-title">🚚 طريقة الدفع</div>
+      <div class="cod-badge">
+        <span class="cod-icon">💵</span>
+        <div>
+          <div style="font-weight:900;margin-bottom:.25rem">الدفع عند الاستلام</div>
+          <div style="font-size:.8rem;opacity:.75">ادفع نقداً لما يوصلك الطلب — مفيش دفع أونلاين</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="checkout-section">
+      <div class="checkout-section-title">🎟️ كود الخصم</div>
+      <div class="promo-section">
+        <div class="promo-input-row">
+          <input type="text" class="form-control" id="promo-input" placeholder="ادخل كود الخصم هنا..." style="text-transform:uppercase"/>
+          <button class="promo-apply-btn" onclick="applyPromo()">تطبيق</button>
+        </div>
+        <div class="promo-result" id="promo-result"></div>
+      </div>
+    </div>
+
+    <div class="checkout-section">
+      <div class="checkout-section-title">📋 ملخص الطلب</div>
+      <div id="checkout-items"></div>
+      <div id="discount-row" style="display:none" class="discount-row">
+        <span>🎟️ كود الخصم (<span id="discount-pct"></span>%)</span>
+        <span id="discount-val" style="font-family:var(--font-display)"></span>
+      </div>
+      <div id="shipping-row" style="display:none" class="discount-row">
+        <span>🚚 التوصيل</span>
+        <span style="font-family:var(--font-display)">مجاني 🎉</span>
+      </div>
+      <div class="order-total-row">
+        <span class="order-total-label">الإجمالي</span>
+        <span class="order-total-val" id="checkout-total">0 EGP</span>
+      </div>
+    </div>
+
+    <button class="place-order-btn" id="place-order-btn" onclick="placeOrder()">✅ تأكيد الطلب</button>
   </div>
 </div>
 
-<!-- ============ LOBBY ============ -->
-<div class="screen" id="lobby">
-  <div class="logo">
-    <div class="logo-tiles">
-      <div class="deco-tile">
-        <div class="half"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-        <div class="sep"></div>
-        <div class="half"><div class="dot"></div></div>
-      </div>
-      <div class="deco-tile">
-        <div class="half"><div class="dot"></div></div>
-        <div class="sep"></div>
-        <div class="half"><div class="dot"></div><div class="dot"></div></div>
-      </div>
-      <div class="deco-tile">
-        <div class="half"></div>
-        <div class="sep"></div>
-        <div class="half"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-      </div>
-    </div>
-    <h1>دومنو</h1>
-    <div class="tagline">العب أونلاين مع أصدقاءك</div>
-  </div>
-
-  <div class="card">
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab('create')">إنشاء غرفة</button>
-      <button class="tab" onclick="switchTab('join')">الانضمام</button>
-    </div>
-
-    <!-- Create tab -->
-    <div id="tab-create">
-      <div class="input-group">
-        <label>اسمك</label>
-        <input type="text" id="create-name" placeholder="أدخل اسمك..." maxlength="20" value="">
-      </div>
-      <div class="input-group">
-        <label>عدد اللاعبين</label>
-        <select id="create-players">
-          <option value="2">2 لاعبين</option>
-          <option value="3">3 لاعبين</option>
-          <option value="4">4 لاعبين</option>
-        </select>
-      </div>
-      <div class="input-group">
-        <label>هدف النقاط للفوز</label>
-        <select id="create-goal">
-          <option value="100">100 نقطة</option>
-          <option value="150">150 نقطة</option>
-          <option value="200">200 نقطة</option>
-          <option value="50">50 نقطة (سريع)</option>
-        </select>
-      </div>
-      <button class="btn btn-primary" onclick="createRoom()">🎲 إنشاء غرفة</button>
-    </div>
-
-    <!-- Join tab -->
-    <div id="tab-join" style="display:none">
-      <div class="input-group">
-        <label>اسمك</label>
-        <input type="text" id="join-name" placeholder="أدخل اسمك..." maxlength="20">
-      </div>
-      <div class="input-group">
-        <label>كود الغرفة</label>
-        <input type="text" id="join-code" placeholder="أدخل الكود..." maxlength="6" style="text-transform:uppercase;letter-spacing:4px;font-size:1.2rem;text-align:center">
-      </div>
-      <button class="btn btn-primary" onclick="joinRoom()">🚪 الانضمام</button>
-    </div>
-
-    <div class="divider">أو</div>
-    <button class="btn btn-secondary" onclick="playVsBot()">🤖 العب ضد الكمبيوتر</button>
-    <button class="btn btn-secondary" onclick="document.getElementById('rulesPopup').classList.add('show')" style="margin-top:8px">📋 القواعد</button>
+<!-- ══ SUCCESS PAGE ══ -->
+<div id="page-success" class="page">
+  <div class="success-card">
+    <span class="success-icon">🎉</span>
+    <h1 class="success-title">تم الطلب<br/><span>بنجاح!</span></h1>
+    <p class="success-sub">شكراً لطلبك من Pit House<br/>هيتواصل معاك فريقنا قريباً لتأكيد الطلب والتوصيل</p>
+    <div class="success-order-id" id="success-order-id"></div><br/>
+    <button class="continue-btn" onclick="showShop()">تصفح المزيد من المنتجات →</button>
   </div>
 </div>
 
-<!-- ============ WAITING ROOM ============ -->
-<div class="screen hidden" id="waiting">
-  <div class="card">
-    <h2>⏳ انتظار اللاعبين</h2>
-
-    <div>كود الغرفة:</div>
-    <div class="room-id-display">
-      <span class="rid" id="display-room-id">------</span>
-      <button class="copy-btn" onclick="copyRoomId()" title="نسخ">📋</button>
+<!-- ══ CART DRAWER ══ -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-header">
+    <div class="cart-title">🛒 السلة</div>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-list"></div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="cart-total-label">الإجمالي</span>
+      <span class="cart-total-val" id="cart-total">0 EGP</span>
     </div>
-
-    <div class="players-list" id="players-list"></div>
-    <div class="status-msg" id="wait-status">انتظار بقية اللاعبين...</div>
-
-    <button class="btn btn-primary" id="start-btn" onclick="hostStartGame()" style="display:none">🎲 ابدأ اللعبة!</button>
-    <button class="btn btn-danger" onclick="leaveRoom()">خروج</button>
+    <button class="checkout-btn" id="cart-checkout-btn" onclick="goCheckout()">إتمام الطلب →</button>
   </div>
 </div>
 
-<!-- ============ GAME ============ -->
-<div class="screen hidden" id="game">
-  <div class="game-topbar">
-    <div class="gametitle">🀱 دومنو</div>
-    <div class="scores-bar" id="scores-bar"></div>
-    <div class="conn-badge">
-      <div class="conn-dot" id="conn-dot"></div>
-      <span id="conn-label" style="font-size:0.75rem;color:var(--text2)">متصل</span>
+<!-- ══ AUTH MODAL ══ -->
+<div class="modal-backdrop hidden" id="auth-modal" onclick="if(event.target===this)closeAuthModal()">
+  <div class="auth-modal">
+    <button class="auth-modal-close" onclick="closeAuthModal()">✕</button>
+    <div class="auth-logo">PIT <span>HOUSE</span></div>
+    <div class="auth-badge">حسابك في Pit House</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">تسجيل الدخول</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">حساب جديد</button>
     </div>
-  </div>
-
-  <div class="opponents-bar" id="opponents-bar"></div>
-
-  <div class="game-board-wrap">
-    <canvas id="board-canvas"></canvas>
-  </div>
-
-  <div class="hand-area">
-    <div class="hand-label">
-      <span>يدي 🤚 <span id="hand-count">0</span> قطعة</span>
-      <span id="boneyard-count" style="color:var(--text2)">المخزون: <strong style="color:var(--accent)">0</strong></span>
+    <!-- LOGIN -->
+    <div class="auth-form active" id="auth-login">
+      <div class="form-group">
+        <label class="form-label">البريد الإلكتروني</label>
+        <input type="email" class="form-control" id="login-email" placeholder="example@email.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">كلمة المرور</label>
+        <input type="password" class="form-control" id="login-pass" placeholder="كلمة المرور"/>
+      </div>
+      <div class="auth-error" id="login-error"></div>
+      <button class="place-order-btn" style="margin-top:1rem" onclick="doLogin()">دخول →</button>
     </div>
-    <div class="hand-tiles" id="hand-tiles"></div>
-    <div class="action-bar">
-      <button class="action-btn draw" id="draw-btn" onclick="playerDraw()">🎲 اسحب</button>
-      <button class="action-btn pass" id="pass-btn" onclick="playerPass()">⏭ باص</button>
+    <!-- REGISTER -->
+    <div class="auth-form" id="auth-register">
+      <div class="form-group">
+        <label class="form-label">الاسم بالكامل</label>
+        <input type="text" class="form-control" id="reg-name" placeholder="محمد أحمد"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">البريد الإلكتروني</label>
+        <input type="email" class="form-control" id="reg-email" placeholder="example@email.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">كلمة المرور</label>
+        <input type="password" class="form-control" id="reg-pass" placeholder="6 أحرف على الأقل"/>
+      </div>
+      <div class="auth-error" id="reg-error"></div>
+      <button class="place-order-btn" style="margin-top:1rem" onclick="doRegister()">إنشاء الحساب →</button>
     </div>
-    <div class="turn-indicator" id="turn-indicator">دورك! 🎯</div>
   </div>
 </div>
+
+<!-- ══ PROFILE PAGE ══ -->
+<div id="page-profile" class="page">
+  <nav class="navbar">
+    <div class="nav-inner">
+      <div class="nav-logo" onclick="showShop()" style="cursor:pointer">PIT <span>HOUSE</span> <small>SHOP</small></div>
+      <div class="nav-actions">
+        <button class="theme-btn" onclick="toggleTheme()">🌙</button>
+        <button class="nav-cart-btn" onclick="showShop()">← رجوع للمتجر</button>
+      </div>
+    </div>
+  </nav>
+  <div class="profile-container">
+    <div class="profile-header-card">
+      <div class="profile-avatar-lg" id="profile-avatar-lg">؟</div>
+      <div>
+        <div style="font-family:var(--font-display);font-size:1.8rem;letter-spacing:.06em" id="profile-display-name">—</div>
+        <div style="color:var(--text-muted);font-size:.88rem" id="profile-display-email">—</div>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">📍 عناويني المحفوظة</div>
+      <div id="profile-addresses-list"></div>
+      <button class="place-order-btn" style="margin-top:1rem;padding:.85rem" onclick="showAddAddressForm()">+ إضافة عنوان جديد</button>
+      <div id="add-address-form" style="display:none;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)">
+        <div class="form-group">
+          <label class="form-label">اسم العنوان (مثال: البيت، الشغل)</label>
+          <input type="text" class="form-control" id="addr-label" placeholder="البيت"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">العنوان بالتفصيل *</label>
+          <input type="text" class="form-control" id="addr-text" placeholder="المحافظة، المدينة، الشارع، رقم المنزل"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">رقم الموبايل</label>
+          <input type="tel" class="form-control" id="addr-phone" placeholder="01xxxxxxxxx"/>
+        </div>
+        <div style="display:flex;gap:.75rem;margin-top:.75rem">
+          <button class="place-order-btn" style="padding:.8rem;margin-top:0" onclick="saveAddress()">حفظ العنوان</button>
+          <button class="place-order-btn" style="padding:.8rem;margin-top:0;background:var(--bg-secondary);color:var(--text-primary)" onclick="hideAddAddressForm()">إلغاء</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">⚙️ إعدادات الحساب</div>
+      <button class="dropdown-item danger" style="font-size:.95rem;padding:.85rem 1rem;border:1px solid rgba(255,23,68,.2);border-radius:var(--radius-sm);width:100%;justify-content:center" onclick="doLogout()">🚪 تسجيل الخروج</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+<div id="page-spinner"><div class="spinner-ring"></div><div class="spinner-txt">جاري المعالجة...</div></div>
+
+<!-- ══ FIREBASE REALTIME DB ══ -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
 <script>
-// ========== WEBRTC & SIGNALING ==========
-// We use a simple serverless P2P approach via a free public signaling relay
-// For demo: we use a simple in-memory signaling via localStorage + BroadcastChannel
-// In production you'd use a WebSocket signaling server
-
-const BC_PREFIX = 'domino_sig_';
-let bc = null; // BroadcastChannel
-let peerConns = {}; // peerId -> RTCPeerConnection
-let dataChannels = {}; // peerId -> RTCDataChannel
-let myId = Math.random().toString(36).slice(2, 10);
-let roomId = null;
-let isHost = false;
-let myName = '';
-let connectedPeers = []; // [{id, name}]
-let maxPlayers = 2;
-let targetScore = 100;
-let gameSettings = {};
-
-// ========== GAME STATE ==========
-let gameState = null;
-let selectedTile = null;
-let animQueue = [];
-let boardTiles = []; // placed tiles on board
-let boardCanvas, ctx;
-let boardOffset = {x:0, y:0};
-let boardScale = 1;
-let isMyTurn = false;
-let myPlayerIdx = 0;
-let vsBot = false;
-let botThinkTimer = null;
-
-// ============ ICE Config ============
-const iceConfig = {
-  iceServers: [
-    {urls:'stun:stun.l.google.com:19302'},
-    {urls:'stun:stun1.l.google.com:19302'},
-    {urls:'stun:stun2.l.google.com:19302'},
-    {
-      urls: 'turn:openrelay.metered.ca:80',
-      username: 'openrelayproject',
-      credential: 'openrelayproject'
-    }
-  ]
+const firebaseConfig = {
+  apiKey:"AIzaSyD25krWnSJnFLT51o4OYXkBzxSb-b0sZMU",
+  authDomain:"pit-house.firebaseapp.com",
+  databaseURL:"https://pit-house-default-rtdb.firebaseio.com",
+  projectId:"pit-house",
+  storageBucket:"pit-house.firebasestorage.app",
+  messagingSenderId:"1049730961681",
+  appId:"1:1049730961681:web:f2a4028410cdaa34d6fcb0"
 };
+firebase.initializeApp(firebaseConfig);
+const db   = firebase.database();
+const auth = firebase.auth();
 
-// ============ SIGNALING via BroadcastChannel ============
-function initBC(rid) {
-  bc = new BroadcastChannel(BC_PREFIX + rid);
-  bc.onmessage = (ev) => handleSignal(ev.data);
+// ── Theme ─────────────────────────────────────────────────
+let isDark = true;
+function toggleTheme(){
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.querySelectorAll('.theme-btn').forEach(b=>b.textContent=isDark?'🌙':'☀️');
 }
 
-function sendSignal(msg) {
-  if (bc) bc.postMessage({...msg, from: myId});
+// ── State ─────────────────────────────────────────────────
+let cart = [];
+let currentUser = null;
+let appliedPromo = null;
+
+// ── Utils ─────────────────────────────────────────────────
+function formatPrice(n){if(!n&&n!==0)return'٠ EGP';return Number(n).toLocaleString('ar-EG')+' EGP'}
+function esc(s){const d=document.createElement('div');d.appendChild(document.createTextNode(s||''));return d.innerHTML}
+function objToArray(obj){if(!obj)return[];return Object.entries(obj).map(([id,val])=>({id,...val}))}
+
+function showToast(msg,type='success'){
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;el.textContent=msg;
+  document.getElementById('toast-container').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transition='.3s';setTimeout(()=>el.remove(),300)},2700);
 }
+function showSpinner(){document.getElementById('page-spinner').classList.add('show')}
+function hideSpinner(){document.getElementById('page-spinner').classList.remove('show')}
 
-async function handleSignal(msg) {
-  if (msg.from === myId) return;
-  if (msg.to && msg.to !== myId) return;
-
-  if (msg.type === 'join-announce') {
-    // Someone wants to join, host responds
-    if (!isHost) return;
-    const existing = connectedPeers.find(p => p.id === msg.from);
-    if (!existing && connectedPeers.length < maxPlayers - 1) {
-      connectedPeers.push({id: msg.from, name: msg.name});
-      await createPeerConnection(msg.from, true);
-      updateWaitingRoom();
-      sendSignal({type:'player-list', players: [{id:myId,name:myName},...connectedPeers], to:msg.from});
-    }
-  }
-  else if (msg.type === 'offer') {
-    if (!peerConns[msg.from]) await createPeerConnection(msg.from, false);
-    const pc = peerConns[msg.from];
-    await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
-    const ans = await pc.createAnswer();
-    await pc.setLocalDescription(ans);
-    sendSignal({type:'answer', sdp:ans, to:msg.from});
-  }
-  else if (msg.type === 'answer') {
-    const pc = peerConns[msg.from];
-    if (pc) await pc.setRemoteDescription(new RTCSessionDescription(msg.sdp));
-  }
-  else if (msg.type === 'ice') {
-    const pc = peerConns[msg.from];
-    if (pc && msg.candidate) {
-      try { await pc.addIceCandidate(new RTCIceCandidate(msg.candidate)); } catch(e){}
-    }
-  }
-  else if (msg.type === 'player-list' && !isHost) {
-    // Update waiting room as non-host
-    connectedPeers = msg.players.filter(p=>p.id!==myId);
-    updateWaitingRoom();
-  }
+// ── Navigation ────────────────────────────────────────────
+function showShop(){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-shop').classList.add('active');closeCart()}
+function showCheckout(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-checkout').classList.add('active');
+  closeCart();
+  appliedPromo=null;
+  document.getElementById('promo-input').value='';
+  document.getElementById('promo-result').textContent='';
+  document.getElementById('promo-result').className='promo-result';
+  document.getElementById('discount-row').style.display='none';
+  document.getElementById('shipping-row').style.display='none';
+  renderCheckoutSummary();
+  loadSavedAddressesForCheckout();
+  window.scrollTo(0,0);
 }
+function showSuccess(id){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-success').classList.add('active');document.getElementById('success-order-id').textContent='رقم الطلب: '+id;window.scrollTo(0,0)}
+function showProfile(){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-profile').classList.add('active');
+  loadProfileData();
+  window.scrollTo(0,0);
+}
+function goCheckout(){if(!cart.length){showToast('السلة فاضية!','error');return}showCheckout()}
 
-async function createPeerConnection(peerId, initiator) {
-  const pc = new RTCPeerConnection(iceConfig);
-  peerConns[peerId] = pc;
-
-  pc.onicecandidate = (ev) => {
-    if (ev.candidate) sendSignal({type:'ice', candidate:ev.candidate, to:peerId});
-  };
-
-  pc.onconnectionstatechange = () => {
-    updateConnStatus();
-    if (pc.connectionState === 'connected') {
-      showToast('✅ اتصال ناجح!');
-    }
-  };
-
-  if (initiator) {
-    const dc = pc.createDataChannel('domino', {ordered:true});
-    setupDataChannel(dc, peerId);
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    sendSignal({type:'offer', sdp:offer, to:peerId});
+// ── Auth ──────────────────────────────────────────────────
+auth.onAuthStateChanged(user=>{
+  currentUser = user;
+  if(user){
+    const initials=(user.displayName||user.email||'؟').charAt(0).toUpperCase();
+    document.getElementById('nav-avatar').textContent=initials;
+    document.getElementById('nav-username').textContent=user.displayName||user.email.split('@')[0];
+    document.getElementById('dd-name').textContent=user.displayName||'—';
+    document.getElementById('dd-email').textContent=user.email;
+    document.getElementById('nav-auth-guest').style.display='none';
+    document.getElementById('nav-auth-user').style.display='flex';
   } else {
-    pc.ondatachannel = (ev) => setupDataChannel(ev.channel, peerId);
+    document.getElementById('nav-auth-guest').style.display='flex';
+    document.getElementById('nav-auth-user').style.display='none';
   }
-  return pc;
-}
-
-function setupDataChannel(dc, peerId) {
-  dataChannels[peerId] = dc;
-  dc.onopen = () => {
-    console.log('DC open with', peerId);
-    updateConnStatus();
-  };
-  dc.onmessage = (ev) => {
-    try { handleGameMessage(JSON.parse(ev.data), peerId); } catch(e) { console.error(e); }
-  };
-  dc.onerror = (e) => console.error('DC error', e);
-}
-
-function sendToAll(msg) {
-  const data = JSON.stringify(msg);
-  Object.values(dataChannels).forEach(dc => {
-    if (dc.readyState === 'open') dc.send(data);
-  });
-}
-
-function sendToHost(msg) {
-  if (isHost) { handleGameMessage(msg, myId); return; }
-  const hostId = connectedPeers[0]?.id; // first connected is usually host
-  // Actually we need to know host id
-  const hdc = dataChannels[Object.keys(dataChannels)[0]];
-  if (hdc && hdc.readyState === 'open') hdc.send(JSON.stringify(msg));
-}
-
-function updateConnStatus() {
-  const dot = document.getElementById('conn-dot');
-  const lbl = document.getElementById('conn-label');
-  if (!dot) return;
-  const states = Object.values(peerConns).map(p=>p.connectionState);
-  if (vsBot || isHost && connectedPeers.length===0) {
-    dot.className='conn-dot connected'; lbl.textContent='محلي';
-  } else if (states.every(s=>s==='connected')) {
-    dot.className='conn-dot connected'; lbl.textContent='متصل';
-  } else if (states.some(s=>s==='connecting'||s==='new')) {
-    dot.className='conn-dot connecting'; lbl.textContent='اتصال...';
-  } else {
-    dot.className='conn-dot error'; lbl.textContent='منقطع';
-  }
-}
-
-// ============ ROOM MANAGEMENT ============
-function generateRoomId() {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  return Array.from({length:6}, ()=>chars[Math.floor(Math.random()*chars.length)]).join('');
-}
-
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.textContent.includes(tab==='create'?'إنشاء':'الانضمام')));
-  document.getElementById('tab-create').style.display = tab==='create'?'':'none';
-  document.getElementById('tab-join').style.display   = tab==='join'  ?'':'none';
-}
-
-function createRoom() {
-  myName = document.getElementById('create-name').value.trim() || 'لاعب 1';
-  maxPlayers = parseInt(document.getElementById('create-players').value);
-  targetScore = parseInt(document.getElementById('create-goal').value);
-  roomId = generateRoomId();
-  isHost = true;
-  connectedPeers = [];
-  initBC(roomId);
-  showScreen('waiting');
-  document.getElementById('display-room-id').textContent = roomId;
-  updateWaitingRoom();
-}
-
-function joinRoom() {
-  myName = document.getElementById('join-name').value.trim() || 'لاعب';
-  const code = document.getElementById('join-code').value.trim().toUpperCase();
-  if (code.length !== 6) { showToast('❌ أدخل كود صحيح', 'err'); return; }
-  roomId = code;
-  isHost = false;
-  initBC(roomId);
-  showScreen('waiting');
-  document.getElementById('display-room-id').textContent = roomId;
-  setWaitStatus('جاري الاتصال...', 'loading');
-  sendSignal({type:'join-announce', name:myName});
-  updateWaitingRoom();
-}
-
-function updateWaitingRoom() {
-  const list = document.getElementById('players-list');
-  const allPlayers = [{id:myId, name:myName, isMe:true}, ...connectedPeers.map(p=>({...p,isMe:false}))];
-  const slots = Math.max(maxPlayers, allPlayers.length);
-
-  list.innerHTML = '';
-  for (let i=0; i<slots; i++) {
-    const p = allPlayers[i];
-    const slot = document.createElement('div');
-    slot.className = 'player-slot' + (p ? (p.isMe?' me':' filled') : '');
-    if (p) {
-      const badges = [i===0?'<span class="player-badge host">مضيف</span>':'', p.isMe?'<span class="player-badge you">أنت</span>':''].join('');
-      slot.innerHTML = `<div class="player-avatar">${p.isMe?'😊':'👤'}</div><div class="player-name">${p.name}</div>${badges}`;
-    } else {
-      slot.innerHTML = `<div class="player-avatar">⏳</div><div class="player-name" style="color:var(--text2)">انتظار...</div>`;
-    }
-    list.appendChild(slot);
-  }
-
-  const startBtn = document.getElementById('start-btn');
-  if (isHost) {
-    const total = 1 + connectedPeers.length;
-    if (total >= 2) {
-      startBtn.style.display = 'block';
-      startBtn.textContent = `🎲 ابدأ مع ${total} لاعبين`;
-    } else {
-      startBtn.style.display = 'none';
-    }
-    setWaitStatus(`${1+connectedPeers.length}/${maxPlayers} لاعبين متصلين`);
-  }
-}
-
-function setWaitStatus(msg, type='') {
-  const el = document.getElementById('wait-status');
-  el.textContent = msg;
-  el.className = 'status-msg ' + type;
-}
-
-function copyRoomId() {
-  navigator.clipboard.writeText(roomId).then(()=>showToast('✅ تم نسخ الكود!')).catch(()=>{});
-}
-
-function leaveRoom() {
-  Object.values(peerConns).forEach(pc=>pc.close());
-  peerConns={};dataChannels={};
-  if (bc){bc.close();bc=null;}
-  showScreen('lobby');
-}
-
-function hostStartGame() {
-  if (!isHost) return;
-  const playerList = [{id:myId, name:myName}, ...connectedPeers];
-  const initialState = initGameState(playerList, targetScore);
-  gameState = initialState;
-  // Tell all clients to start
-  sendToAll({type:'game-start', state:gameState, playerList, targetScore});
-  startGameUI(playerList, 0);
-}
-
-// ============ VS BOT ============
-function playVsBot() {
-  myName = document.getElementById('create-name').value.trim() || 'أنت';
-  vsBot = true;
-  isHost = true;
-  roomId = 'LOCAL';
-  const playerList = [{id:myId, name:myName}, {id:'bot1', name:'كمبيوتر 🤖'}];
-  gameState = initGameState(playerList, 100);
-  showScreen('game');
-  startGameUI(playerList, 0);
-}
-
-// ============ GAME LOGIC ============
-function createDominoSet() {
-  const tiles = [];
-  for (let a=0; a<=6; a++)
-    for (let b=a; b<=6; b++)
-      tiles.push([a,b]);
-  return tiles;
-}
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}
-  return a;
-}
-
-function initGameState(players, goal) {
-  const tiles = shuffle(createDominoSet());
-  const hands = {};
-  players.forEach((p,i) => {
-    hands[p.id] = tiles.splice(0,7);
-  });
-  // Find who starts (highest double)
-  let startPlayer = 0;
-  let bestDouble = -1;
-  players.forEach((p,i) => {
-    hands[p.id].forEach(t => {
-      if (t[0]===t[1] && t[0]>bestDouble) {
-        bestDouble = t[0]; startPlayer = i;
-      }
-    });
-  });
-
-  return {
-    players,
-    hands,
-    boneyard: tiles,
-    board: [],
-    boardEnds: null, // {left:N, right:N}
-    currentPlayer: startPlayer,
-    scores: Object.fromEntries(players.map(p=>[p.id,0])),
-    targetScore: goal,
-    round: 1,
-    passCount: 0,
-    gameOver: false,
-    winner: null
-  };
-}
-
-function canPlayTile(tile, ends) {
-  if (!ends) return true; // first tile
-  return tile[0]===ends.left || tile[1]===ends.left ||
-         tile[0]===ends.right || tile[1]===ends.right;
-}
-
-function getPlayableTiles(hand, ends) {
-  return hand.filter(t => canPlayTile(t, ends));
-}
-
-function placeTile(state, playerIdx, tile, side) {
-  // 'left' or 'right'
-  const player = state.players[playerIdx];
-  const handIdx = state.hands[player.id].findIndex(t=>t[0]===tile[0]&&t[1]===tile[1]);
-  if (handIdx === -1) return false;
-
-  state.hands[player.id].splice(handIdx, 1);
-
-  if (!state.boardEnds) {
-    // First tile
-    state.board.push({tile, side:'first', x:0, y:0, rot:0});
-    state.boardEnds = {left: tile[0], right: tile[1]};
-  } else {
-    if (side === 'left') {
-      let t = [...tile];
-      if (t[1] !== state.boardEnds.left) t = [t[1],t[0]];
-      state.board.push({tile:t, side:'left'});
-      state.boardEnds.left = t[0];
-    } else {
-      let t = [...tile];
-      if (t[0] !== state.boardEnds.right) t = [t[1],t[0]];
-      state.board.push({tile:t, side:'right'});
-      state.boardEnds.right = t[1];
-    }
-  }
-
-  state.passCount = 0;
-
-  // Check win
-  if (state.hands[player.id].length === 0) {
-    endRound(state, playerIdx);
-    return true;
-  }
-
-  nextTurn(state);
-  return true;
-}
-
-function nextTurn(state) {
-  state.currentPlayer = (state.currentPlayer + 1) % state.players.length;
-}
-
-function endRound(state, winnerIdx) {
-  const winner = state.players[winnerIdx];
-  let pts = 0;
-  state.players.forEach(p => {
-    if (p.id !== winner.id) {
-      const sum = state.hands[p.id].reduce((s,t)=>s+t[0]+t[1],0);
-      pts += sum;
-    }
-  });
-  state.scores[winner.id] = (state.scores[winner.id]||0) + pts;
-
-  if (state.scores[winner.id] >= state.targetScore) {
-    state.gameOver = true;
-    state.winner = winner;
-  }
-}
-
-function checkBlocked(state) {
-  return state.players.every(p =>
-    getPlayableTiles(state.hands[p.id], state.boardEnds).length === 0
-  );
-}
-
-function resolveBlockedGame(state) {
-  // Who has least points in hand?
-  let minPts = Infinity, winnerIdx = 0;
-  state.players.forEach((p,i)=>{
-    const pts = state.hands[p.id].reduce((s,t)=>s+t[0]+t[1],0);
-    if (pts<minPts){minPts=pts;winnerIdx=i;}
-  });
-  endRound(state, winnerIdx);
-}
-
-// ============ GAME UI ============
-let allPlayers = [];
-
-function startGameUI(players, myIdx) {
-  allPlayers = players;
-  myPlayerIdx = myIdx;
-  boardTiles = [];
-  selectedTile = null;
-
-  showScreen('game');
-  boardCanvas = document.getElementById('board-canvas');
-  ctx = boardCanvas.getContext('2d');
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
-
-  renderAll();
-  checkMyTurn();
-}
-
-function renderAll() {
-  renderScores();
-  renderOpponents();
-  renderHand();
-  renderBoard();
-  renderTurnIndicator();
-  renderBoneyardCount();
-}
-
-function renderScores() {
-  const bar = document.getElementById('scores-bar');
-  bar.innerHTML = gameState.players.map((p,i)=>`
-    <div class="score-chip ${gameState.currentPlayer===i?'active':''}">
-      <span class="sc-name">${p.name.slice(0,6)}</span>
-      <span class="sc-val">${gameState.scores[p.id]||0}</span>
-    </div>
-  `).join('');
-}
-
-function renderOpponents() {
-  const bar = document.getElementById('opponents-bar');
-  const opponents = gameState.players.filter((_,i)=>i!==myPlayerIdx);
-  bar.innerHTML = opponents.map((p,oi)=>{
-    const idx = gameState.players.indexOf(p);
-    const handCount = gameState.hands[p.id].length;
-    const backs = Array.from({length:Math.min(handCount,7)},()=>`<div class="tile-back"></div>`).join('');
-    return `<div class="opponent-chip ${gameState.currentPlayer===idx?'active-turn':''}">
-      <span>👤</span>
-      <span class="opp-name">${p.name.slice(0,8)}</span>
-      <span class="opp-count">(${handCount})</span>
-      <div class="opp-tiles-back">${backs}</div>
-    </div>`;
-  }).join('');
-}
-
-function renderHand() {
-  const container = document.getElementById('hand-tiles');
-  const myHand = gameState.hands[gameState.players[myPlayerIdx].id];
-  const ends = gameState.boardEnds;
-  document.getElementById('hand-count').textContent = myHand.length;
-
-  container.innerHTML = '';
-  myHand.forEach((tile, idx) => {
-    const playable = canPlayTile(tile, ends) && isMyTurn;
-    const el = buildTileEl(tile, playable, idx);
-    if (isMyTurn && playable) {
-      el.onclick = () => selectTile(tile, el);
-    }
-    container.appendChild(el);
-  });
-}
-
-function buildTileEl(tile, playable, idx) {
-  const el = document.createElement('div');
-  el.className = 'tile' + (playable?' playable':'') + (!playable&&isMyTurn?' disabled':'');
-  el.dataset.tile = JSON.stringify(tile);
-
-  const h1 = document.createElement('div');
-  h1.className = 'tile-half';
-  h1.appendChild(buildDots(tile[0]));
-
-  const sep = document.createElement('div');
-  sep.className = 'tile-sep';
-
-  const h2 = document.createElement('div');
-  h2.className = 'tile-half';
-  h2.appendChild(buildDots(tile[1]));
-
-  el.append(h1, sep, h2);
-  return el;
-}
-
-function buildDots(n) {
-  const wrap = document.createElement('div');
-  wrap.style.cssText = 'display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr 1fr;gap:2px;width:18px;height:18px;align-items:center;justify-items:center;';
-  const positions = {
-    0:[],
-    1:[[1,1]],
-    2:[[0,0],[2,2]],
-    3:[[0,0],[1,1],[2,2]],
-    4:[[0,0],[0,2],[2,0],[2,2]],
-    5:[[0,0],[0,2],[1,1],[2,0],[2,2]],
-    6:[[0,0],[0,1],[0,2],[2,0],[2,1],[2,2]]
-  };
-  const layout = positions[n]||[];
-  // Create 3x3 grid
-  const cells = Array(9).fill(false);
-  layout.forEach(([r,c])=>cells[r*3+c]=true);
-  cells.forEach(hasDot=>{
-    const cell = document.createElement('div');
-    if (hasDot) {
-      cell.className='dot';
-    } else {
-      cell.style.cssText='width:5px;height:5px;';
-    }
-    wrap.appendChild(cell);
-  });
-  return wrap;
-}
-
-function selectTile(tile, el) {
-  if (!isMyTurn) return;
-  const ends = gameState.boardEnds;
-
-  // Deselect
-  document.querySelectorAll('.tile.selected').forEach(t=>t.classList.remove('selected'));
-
-  if (selectedTile && JSON.stringify(selectedTile)===JSON.stringify(tile)) {
-    selectedTile = null;
-    return;
-  }
-
-  selectedTile = tile;
-  el.classList.add('selected');
-
-  // If no board yet, play immediately
-  if (!ends) { playTile(tile, 'right'); return; }
-
-  // Determine valid sides
-  const canLeft  = tile[0]===ends.left || tile[1]===ends.left;
-  const canRight = tile[0]===ends.right|| tile[1]===ends.right;
-
-  if (canLeft && canRight && ends.left !== ends.right) {
-    showSideChoice(tile);
-  } else if (canLeft) {
-    playTile(tile, 'left');
-  } else if (canRight) {
-    playTile(tile, 'right');
-  }
-}
-
-function showSideChoice(tile) {
-  showToast('انقر على الطرف الأيسر أو الأيمن في البورد');
-  // For simplicity highlight ends on canvas
-  isChoosingside = true;
-  sideChoiceTile = tile;
-  renderBoard();
-}
-
-let isChoosingside = false;
-let sideChoiceTile = null;
-
-function playTile(tile, side) {
-  isChoosingside = false;
-  sideChoiceTile = null;
-  document.querySelectorAll('.tile.selected').forEach(t=>t.classList.remove('selected'));
-  selectedTile = null;
-
-  // Apply locally
-  const success = placeTile(gameState, myPlayerIdx, tile, side);
-  if (!success) { showToast('❌ لا يمكن وضع هذه القطعة!'); return; }
-
-  // Send to peers / host
-  if (!vsBot) {
-    sendToAll({type:'player-move', playerIdx:myPlayerIdx, tile, side});
-  }
-
-  renderAll();
-  checkMyTurn();
-
-  if (gameState.gameOver) {
-    setTimeout(()=>showEndScreen(), 800);
-    return;
-  }
-
-  if (checkBlocked(gameState)) {
-    resolveBlockedGame(gameState);
-    renderAll();
-    setTimeout(()=>showEndScreen(), 800);
-    return;
-  }
-
-  // Bot turn
-  if (vsBot && gameState.currentPlayer !== myPlayerIdx) {
-    scheduleBotTurn();
-  }
-}
-
-function playerDraw() {
-  if (!isMyTurn || gameState.boneyard.length === 0) return;
-  const card = gameState.boneyard.pop();
-  const myId2 = gameState.players[myPlayerIdx].id;
-  gameState.hands[myId2].push(card);
-  if (!vsBot) sendToAll({type:'player-draw', playerIdx:myPlayerIdx});
-  renderAll();
-  checkMyTurn();
-  showToast('🎲 سحبت قطعة جديدة!');
-}
-
-function playerPass() {
-  if (!isMyTurn) return;
-  gameState.passCount = (gameState.passCount||0)+1;
-  if (gameState.passCount >= gameState.players.length) {
-    resolveBlockedGame(gameState);
-    renderAll();
-    setTimeout(()=>showEndScreen(), 800);
-    return;
-  }
-  nextTurn(gameState);
-  if (!vsBot) sendToAll({type:'player-pass', playerIdx:myPlayerIdx});
-  renderAll();
-  checkMyTurn();
-  if (vsBot && gameState.currentPlayer !== myPlayerIdx) scheduleBotTurn();
-}
-
-function checkMyTurn() {
-  isMyTurn = gameState.currentPlayer === myPlayerIdx;
-  const drawBtn = document.getElementById('draw-btn');
-  const passBtn = document.getElementById('pass-btn');
-  if (drawBtn) drawBtn.disabled = !isMyTurn || gameState.boneyard.length===0;
-  if (passBtn) passBtn.disabled = !isMyTurn;
-  renderTurnIndicator();
-}
-
-function renderTurnIndicator() {
-  const el = document.getElementById('turn-indicator');
-  if (!el) return;
-  const cur = gameState.players[gameState.currentPlayer];
-  if (gameState.currentPlayer === myPlayerIdx) {
-    el.innerHTML = 'دورك! 🎯';
-    el.style.color = 'var(--accent)';
-  } else {
-    el.innerHTML = `دور <span>${cur.name}</span>`;
-    el.style.color = 'var(--text2)';
-  }
-}
-
-function renderBoneyardCount() {
-  const el = document.getElementById('boneyard-count');
-  if (el) el.innerHTML = `المخزون: <strong style="color:var(--accent)">${gameState.boneyard.length}</strong>`;
-}
-
-// ============ BOT AI ============
-function scheduleBotTurn() {
-  clearTimeout(botThinkTimer);
-  botThinkTimer = setTimeout(botPlay, 1200 + Math.random()*600);
-}
-
-function botPlay() {
-  if (gameState.gameOver) return;
-  const botIdx = gameState.players.findIndex(p=>p.id==='bot1');
-  if (gameState.currentPlayer !== botIdx) return;
-
-  const botId = 'bot1';
-  const ends = gameState.boardEnds;
-  let playable = getPlayableTiles(gameState.hands[botId], ends);
-
-  if (playable.length === 0) {
-    // Draw
-    if (gameState.boneyard.length > 0) {
-      const card = gameState.boneyard.pop();
-      gameState.hands[botId].push(card);
-      renderAll();
-      playable = getPlayableTiles(gameState.hands[botId], ends);
-      if (playable.length === 0) {
-        // Pass
-        gameState.passCount = (gameState.passCount||0)+1;
-        if (gameState.passCount>=gameState.players.length) {
-          resolveBlockedGame(gameState);
-          renderAll();
-          setTimeout(()=>showEndScreen(),800);
-          return;
-        }
-        nextTurn(gameState);
-        renderAll();
-        checkMyTurn();
-        return;
-      }
-    } else {
-      gameState.passCount = (gameState.passCount||0)+1;
-      if (gameState.passCount>=gameState.players.length){resolveBlockedGame(gameState);renderAll();setTimeout(()=>showEndScreen(),800);return;}
-      nextTurn(gameState);
-      renderAll();
-      checkMyTurn();
-      return;
-    }
-  }
-
-  // Choose best tile (prefer doubles, prefer higher numbers)
-  playable.sort((a,b)=>{
-    const scoreA = a[0]===a[1]?100+a[0]*2:a[0]+a[1];
-    const scoreB = b[0]===b[1]?100+b[0]*2:b[0]+b[1];
-    return scoreB-scoreA;
-  });
-  const chosen = playable[0];
-
-  // Choose side
-  let side = 'right';
-  if (ends) {
-    const canL = chosen[0]===ends.left||chosen[1]===ends.left;
-    const canR = chosen[0]===ends.right||chosen[1]===ends.right;
-    if (canL && !canR) side='left';
-    else if (canR) side='right';
-  }
-
-  placeTile(gameState, botIdx, chosen, side);
-  renderAll();
-  checkMyTurn();
-
-  if (gameState.gameOver) {setTimeout(()=>showEndScreen(),800);return;}
-  if (checkBlocked(gameState)){resolveBlockedGame(gameState);renderAll();setTimeout(()=>showEndScreen(),800);return;}
-  if (vsBot && gameState.currentPlayer !== myPlayerIdx) scheduleBotTurn();
-}
-
-// ============ BOARD RENDERER (Canvas) ============
-const TILE_W = 56, TILE_H = 28, PAD = 6;
-
-function resizeCanvas() {
-  if (!boardCanvas) return;
-  boardCanvas.width = boardCanvas.offsetWidth;
-  boardCanvas.height = boardCanvas.offsetHeight;
-  renderBoard();
-}
-
-function renderBoard() {
-  if (!ctx) return;
-  const W = boardCanvas.width, H = boardCanvas.height;
-  ctx.clearRect(0,0,W,H);
-
-  // background
-  ctx.fillStyle = '#0f1520';
-  ctx.fillRect(0,0,W,H);
-
-  // subtle felt texture
-  ctx.fillStyle = 'rgba(64,255,128,0.015)';
-  for (let i=0;i<W;i+=20)
-    for (let j=0;j<H;j+=20)
-      ctx.fillRect(i,j,10,10);
-
-  if (!gameState || !gameState.board || gameState.board.length===0) {
-    // Draw placeholder
-    ctx.fillStyle = 'rgba(255,255,255,0.05)';
-    ctx.font = '14px Cairo';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('ضع أول قطعة...', W/2, H/2);
-    return;
-  }
-
-  // Layout tiles in a chain
-  const layout = computeBoardLayout(gameState.board, W, H);
-  layout.forEach(item => drawBoardTile(item));
-
-  // Highlight ends if choosing side
-  if (isChoosingside && gameState.boardEnds) {
-    const first = layout[0];
-    const last = layout[layout.length-1];
-    if (first) highlightEnd(first, 'left');
-    if (last)  highlightEnd(last, 'right');
-  }
-}
-
-function computeBoardLayout(board, W, H) {
-  if (board.length===0) return [];
-  const tw = TILE_W+PAD, th = TILE_H+PAD;
-  const cx = W/2, cy = H/2;
-  const layout = [];
-  let x = cx, y = cy;
-  let dir = 1; // 1=right, -1=left
-
-  board.forEach((bt, i) => {
-    const isDouble = bt.tile[0]===bt.tile[1];
-    const w = isDouble ? TILE_H : TILE_W;
-    const h = isDouble ? TILE_W : TILE_H;
-
-    // Simple horizontal snake layout
-    let lx = x, ly = y;
-    if (i>0) {
-      if (bt.side==='left') {
-        lx = layout[0].x - (w + PAD);
-      } else {
-        lx = layout[layout.length-1].x + layout[layout.length-1].w + PAD;
-      }
-    }
-
-    // Wrap if off screen
-    if (lx + w > W - 20) { lx = 20; ly = layout[layout.length-1].y + TILE_H + PAD*2; }
-    if (lx < 20 && dir===-1) { lx = W - w - 20; ly = layout[layout.length-1].y + TILE_H + PAD*2; }
-
-    layout.push({...bt, x:lx, y:ly-(h/2), w, h, isDouble});
-    if (i===0) { x = lx; y = ly; }
-  });
-
-  // Better: just stack horizontally from center
-  const total = board.length;
-  const perRow = Math.floor((W-40)/(TILE_W+PAD));
-  let startX = Math.max(20, cx - (Math.min(total,perRow)*(TILE_W+PAD))/2);
-  let row = 0;
-
-  return board.map((bt,i)=>{
-    const isDouble = bt.tile[0]===bt.tile[1];
-    const col = i % perRow;
-    if (i>0 && col===0) row++;
-    const bx = startX + col*(TILE_W+PAD);
-    const by = cy - (TILE_H/2) + row*(TILE_H+PAD+4) - Math.floor(total/perRow/2)*(TILE_H+PAD+4);
-    return {
-      ...bt,
-      x: bx,
-      y: by,
-      w: isDouble ? TILE_H : TILE_W,
-      h: isDouble ? TILE_W : TILE_H,
-      isDouble
-    };
-  });
-}
-
-function drawBoardTile(item) {
-  const {x,y,w,h,tile,isDouble} = item;
-
-  // Shadow
-  ctx.shadowBlur=8; ctx.shadowColor='rgba(0,0,0,0.5)';
-
-  // Tile background
-  const grad = ctx.createLinearGradient(x,y,x,y+h);
-  grad.addColorStop(0,'#f8f4ec');
-  grad.addColorStop(1,'#ede8d8');
-  ctx.fillStyle = grad;
-  roundRect(ctx, x, y, w, h, 4);
-  ctx.fill();
-
-  // Border
-  ctx.shadowBlur=0;
-  ctx.strokeStyle='#ccc0a0';
-  ctx.lineWidth=1;
-  ctx.stroke();
-
-  // Divider line
-  if (isDouble) {
-    ctx.strokeStyle='rgba(0,0,0,0.15)';
-    ctx.lineWidth=1;
-    ctx.beginPath();
-    ctx.moveTo(x,y+h/2);
-    ctx.lineTo(x+w,y+h/2);
-    ctx.stroke();
-  } else {
-    ctx.strokeStyle='rgba(0,0,0,0.15)';
-    ctx.lineWidth=1;
-    ctx.beginPath();
-    ctx.moveTo(x+w/2,y+3);
-    ctx.lineTo(x+w/2,y+h-3);
-    ctx.stroke();
-  }
-
-  // Dots
-  if (isDouble) {
-    drawDotGrid(tile[0], x, y, w, h/2);
-    drawDotGrid(tile[1], x, y+h/2, w, h/2);
-  } else {
-    drawDotGrid(tile[0], x, y, w/2, h);
-    drawDotGrid(tile[1], x+w/2, y, w/2, h);
-  }
-}
-
-function highlightEnd(item, side) {
-  const {x,y,w,h} = item;
-  ctx.strokeStyle='rgba(240,192,64,0.8)';
-  ctx.lineWidth=2;
-  ctx.shadowBlur=12; ctx.shadowColor='rgba(240,192,64,0.5)';
-  roundRect(ctx,x-2,y-2,w+4,h+4,5);
-  ctx.stroke();
-  ctx.shadowBlur=0;
-}
-
-function roundRect(ctx,x,y,w,h,r){
-  ctx.beginPath();
-  ctx.moveTo(x+r,y);
-  ctx.lineTo(x+w-r,y);
-  ctx.quadraticCurveTo(x+w,y,x+w,y+r);
-  ctx.lineTo(x+w,y+h-r);
-  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);
-  ctx.lineTo(x+r,y+h);
-  ctx.quadraticCurveTo(x,y+h,x,y+h-r);
-  ctx.lineTo(x,y+r);
-  ctx.quadraticCurveTo(x,y,x+r,y);
-  ctx.closePath();
-}
-
-const DOT_POSITIONS = {
-  0:[],
-  1:[[0.5,0.5]],
-  2:[[0.25,0.25],[0.75,0.75]],
-  3:[[0.25,0.25],[0.5,0.5],[0.75,0.75]],
-  4:[[0.25,0.25],[0.75,0.25],[0.25,0.75],[0.75,0.75]],
-  5:[[0.25,0.25],[0.75,0.25],[0.5,0.5],[0.25,0.75],[0.75,0.75]],
-  6:[[0.25,0.2],[0.25,0.5],[0.25,0.8],[0.75,0.2],[0.75,0.5],[0.75,0.8]]
-};
-
-function drawDotGrid(n, x, y, w, h) {
-  const positions = DOT_POSITIONS[n]||[];
-  const r = Math.min(w,h)*0.085;
-  ctx.fillStyle='#1a1020';
-  positions.forEach(([px,py])=>{
-    ctx.beginPath();
-    ctx.arc(x+px*w, y+py*h, r, 0, Math.PI*2);
-    ctx.fill();
-  });
-}
-
-// ============ MULTIPLAYER MSG HANDLING ============
-function handleGameMessage(msg, fromId) {
-  if (msg.type === 'game-start') {
-    gameState = msg.state;
-    const players = msg.playerList;
-    const myIdx = players.findIndex(p=>p.id===myId);
-    startGameUI(players, myIdx>=0?myIdx:0);
-  }
-  else if (msg.type === 'player-move') {
-    if (msg.playerIdx === myPlayerIdx) return;
-    placeTile(gameState, msg.playerIdx, msg.tile, msg.side);
-    renderAll();
-    checkMyTurn();
-    if (gameState.gameOver) setTimeout(()=>showEndScreen(),800);
-  }
-  else if (msg.type === 'player-draw') {
-    if (msg.playerIdx !== myPlayerIdx) {
-      const p = gameState.players[msg.playerIdx];
-      const card = gameState.boneyard.pop();
-      gameState.hands[p.id].push(card);
-      renderAll();
-    }
-  }
-  else if (msg.type === 'player-pass') {
-    if (msg.playerIdx !== myPlayerIdx) {
-      gameState.passCount = (gameState.passCount||0)+1;
-      nextTurn(gameState);
-      renderAll();
-      checkMyTurn();
-    }
-  }
-  else if (msg.type === 'chat') {
-    showToast(`💬 ${msg.name}: ${msg.text}`);
-  }
-}
-
-// ============ END SCREEN ============
-function showEndScreen() {
-  const overlay = document.getElementById('end-overlay');
-  const title = document.getElementById('end-title');
-  const emoji = document.getElementById('end-emoji');
-  const scores = document.getElementById('end-scores');
-
-  const winner = gameState.winner;
-  const isWinner = winner && winner.id === gameState.players[myPlayerIdx].id;
-
-  overlay.classList.add('show');
-  if (isWinner) {
-    emoji.textContent='🏆';
-    title.textContent='فزت!';
-    title.className='end-title win';
-  } else {
-    emoji.textContent='😔';
-    title.textContent=`فاز ${winner?.name||''}!`;
-    title.className='end-title lose';
-  }
-
-  scores.innerHTML = '<div style="color:var(--text2);margin-bottom:8px;font-size:0.8rem;">النقاط النهائية</div>' +
-    gameState.players.map(p=>`
-      <div class="end-score-row">
-        <span>${p.name}</span>
-        <strong style="color:var(--accent)">${gameState.scores[p.id]||0}</strong>
-      </div>
-    `).join('');
-}
-
-document.getElementById('playAgainBtn').onclick = () => {
-  document.getElementById('end-overlay').classList.remove('show');
-  if (vsBot) {
-    playVsBot();
-  } else if (isHost) {
-    hostStartGame();
-  }
-};
-document.getElementById('backLobbyBtn').onclick = () => {
-  document.getElementById('end-overlay').classList.remove('show');
-  showScreen('lobby');
-};
-
-// Canvas click for side selection
-boardCanvas && boardCanvas.addEventListener('click', (e) => {
-  if (!isChoosingside || !sideChoiceTile) return;
-  const rect = boardCanvas.getBoundingClientRect();
-  const cx = e.clientX - rect.left;
-  const W = boardCanvas.width;
-  playTile(sideChoiceTile, cx < W/2 ? 'left' : 'right');
 });
 
-// Lazy canvas setup
-setTimeout(()=>{
-  boardCanvas = document.getElementById('board-canvas');
-  if (boardCanvas) {
-    ctx = boardCanvas.getContext('2d');
-    boardCanvas.addEventListener('click', (e) => {
-      if (!isChoosingside || !sideChoiceTile) return;
-      const rect = boardCanvas.getBoundingClientRect();
-      const cx = e.clientX - rect.left;
-      const W = boardCanvas.width;
-      playTile(sideChoiceTile, cx < W/2 ? 'left' : 'right');
-    });
-  }
-},100);
+function openAuthModal(){document.getElementById('auth-modal').classList.remove('hidden')}
+function closeAuthModal(){document.getElementById('auth-modal').classList.add('hidden')}
+function switchAuthTab(tab){
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',i===(tab==='login'?0:1)));
+  document.getElementById('auth-login').classList.toggle('active',tab==='login');
+  document.getElementById('auth-register').classList.toggle('active',tab==='register');
+}
 
-// ============ HELPERS ============
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s=>{
-    s.classList.toggle('hidden', s.id!==id);
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pass=document.getElementById('login-pass').value;
+  const errEl=document.getElementById('login-error');
+  errEl.textContent='';
+  if(!email||!pass){errEl.textContent='ادخل الإيميل وكلمة المرور';return}
+  try{
+    await auth.signInWithEmailAndPassword(email,pass);
+    closeAuthModal();
+    showToast('أهلاً بيك! 👋','success');
+  }catch(err){
+    const msgs={'auth/user-not-found':'الحساب مش موجود','auth/wrong-password':'كلمة المرور غلط','auth/invalid-email':'إيميل غير صحيح','auth/invalid-credential':'الإيميل أو كلمة المرور غلط'};
+    errEl.textContent=msgs[err.code]||err.message;
+  }
+}
+
+async function doRegister(){
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const pass=document.getElementById('reg-pass').value;
+  const errEl=document.getElementById('reg-error');
+  errEl.textContent='';
+  if(!name){errEl.textContent='ادخل اسمك';return}
+  if(!email){errEl.textContent='ادخل الإيميل';return}
+  if(pass.length<6){errEl.textContent='كلمة المرور أقل من 6 أحرف';return}
+  try{
+    const cred=await auth.createUserWithEmailAndPassword(email,pass);
+    await cred.user.updateProfile({displayName:name});
+    await db.ref('users/'+cred.user.uid).set({name,email,createdAt:Date.now()});
+    closeAuthModal();
+    showToast('تم إنشاء الحساب! 🎉','success');
+  }catch(err){
+    const msgs={'auth/email-already-in-use':'الإيميل ده مسجّل بالفعل','auth/invalid-email':'إيميل غير صحيح','auth/weak-password':'كلمة المرور ضعيفة'};
+    errEl.textContent=msgs[err.code]||err.message;
+  }
+}
+
+async function doLogout(){
+  await auth.signOut();
+  showShop();
+  showToast('تم تسجيل الخروج','info');
+}
+
+function toggleProfileDropdown(){
+  document.getElementById('profile-dropdown').classList.toggle('hidden');
+}
+document.addEventListener('click',e=>{
+  const wrap=document.getElementById('nav-auth-user');
+  if(wrap && !wrap.contains(e.target)) document.getElementById('profile-dropdown').classList.add('hidden');
+});
+
+// ── Profile & Addresses ───────────────────────────────────
+function loadProfileData(){
+  if(!currentUser)return;
+  const initials=(currentUser.displayName||currentUser.email||'؟').charAt(0).toUpperCase();
+  document.getElementById('profile-avatar-lg').textContent=initials;
+  document.getElementById('profile-display-name').textContent=currentUser.displayName||'—';
+  document.getElementById('profile-display-email').textContent=currentUser.email;
+  loadAddressesList();
+}
+
+async function loadAddressesList(){
+  if(!currentUser)return;
+  const snap=await db.ref('users/'+currentUser.uid+'/addresses').get();
+  const addrs=objToArray(snap.val());
+  const list=document.getElementById('profile-addresses-list');
+  if(!addrs.length){list.innerHTML='<div style="color:var(--text-muted);font-size:.88rem;padding:.75rem 0">مفيش عناوين محفوظة لحد دلوقتي</div>';return}
+  list.innerHTML=addrs.map(a=>`
+    <div class="saved-address-item">
+      <div>
+        <div class="address-label">📍 ${esc(a.label||'عنوان')}</div>
+        <div class="address-text">${esc(a.text)}</div>
+        ${a.phone?`<div class="address-text">📞 ${esc(a.phone)}</div>`:''}
+      </div>
+      <button onclick="deleteAddress('${a.id}')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:1.1rem;padding:.3rem">🗑</button>
+    </div>`).join('');
+}
+
+function showAddAddressForm(){document.getElementById('add-address-form').style.display='block'}
+function hideAddAddressForm(){document.getElementById('add-address-form').style.display='none';['addr-label','addr-text','addr-phone'].forEach(id=>document.getElementById(id).value='')}
+
+async function saveAddress(){
+  if(!currentUser){showToast('سجّل دخولك الأول','error');return}
+  const label=document.getElementById('addr-label').value.trim()||'عنوان';
+  const text=document.getElementById('addr-text').value.trim();
+  const phone=document.getElementById('addr-phone').value.trim();
+  if(!text){showToast('ادخل العنوان بالتفصيل','error');return}
+  try{
+    await db.ref('users/'+currentUser.uid+'/addresses').push({label,text,phone,createdAt:Date.now()});
+    showToast('تم حفظ العنوان ✓','success');
+    hideAddAddressForm();
+    loadAddressesList();
+  }catch(err){showToast('حصل خطأ، حاول تاني','error')}
+}
+
+async function deleteAddress(id){
+  if(!confirm('هتحذف العنوان ده؟'))return;
+  await db.ref('users/'+currentUser.uid+'/addresses/'+id).remove();
+  showToast('تم حذف العنوان','info');
+  loadAddressesList();
+}
+
+async function loadSavedAddressesForCheckout(){
+  const wrap=document.getElementById('saved-addresses-wrap');
+  const list=document.getElementById('saved-addresses-list');
+  if(!currentUser){wrap.style.display='none';return}
+  const snap=await db.ref('users/'+currentUser.uid+'/addresses').get();
+  const addrs=objToArray(snap.val());
+  if(!addrs.length){wrap.style.display='none';return}
+  wrap.style.display='block';
+  list.innerHTML=addrs.map(a=>`
+    <div class="saved-address-item" id="addr-opt-${a.id}" onclick="selectSavedAddress('${a.id}',${JSON.stringify(a.text)},${JSON.stringify(a.phone||'')})" >
+      <div>
+        <div class="address-label">📍 ${esc(a.label||'عنوان')}</div>
+        <div class="address-text">${esc(a.text)}</div>
+        ${a.phone?`<div class="address-text">📞 ${esc(a.phone)}</div>`:''}
+      </div>
+      <div class="address-select-dot"></div>
+    </div>`).join('');
+}
+
+function selectSavedAddress(id,text,phone){
+  document.querySelectorAll('.saved-address-item').forEach(el=>el.classList.remove('selected'));
+  document.getElementById('addr-opt-'+id)?.classList.add('selected');
+  document.getElementById('c-address').value=text;
+  if(phone) document.getElementById('c-phone').value=phone;
+}
+
+// ── Promo Code ────────────────────────────────────────────
+async function applyPromo(){
+  const code=document.getElementById('promo-input').value.trim().toUpperCase();
+  const resultEl=document.getElementById('promo-result');
+  if(!code){resultEl.textContent='ادخل الكود الأول';resultEl.className='promo-result error';return}
+  resultEl.textContent='جاري التحقق...';resultEl.className='promo-result';
+  try{
+    const snap=await db.ref('promoCodes').orderByChild('code').equalTo(code).get();
+    if(!snap.exists()){resultEl.textContent='❌ الكود غلط أو مش موجود';resultEl.className='promo-result error';return}
+    const promo=Object.values(snap.val())[0];
+    const today=new Date().toISOString().slice(0,10);
+    if(promo.active===false){resultEl.textContent='❌ الكود ده معطّل';resultEl.className='promo-result error';return}
+    if(promo.expiry&&promo.expiry<today){resultEl.textContent='❌ الكود ده منتهي';resultEl.className='promo-result error';return}
+    appliedPromo=promo;
+    resultEl.textContent='✅ '+promo.message;
+    resultEl.className='promo-result success';
+    renderCheckoutSummary();
+  }catch(err){
+    console.error(err);
+    resultEl.textContent='حصل خطأ، حاول تاني';
+    resultEl.className='promo-result error';
+  }
+}
+
+function getFinalTotal(){
+  let total=getCartTotal();
+  if(!appliedPromo)return{total,discount:0,freeShip:false};
+  let discount=0;
+  if(appliedPromo.type==='discount'||appliedPromo.type==='both'){
+    discount=Math.round(total*(appliedPromo.discount/100));
+    total=total-discount;
+  }
+  const freeShip=appliedPromo.type==='freeship'||appliedPromo.type==='both';
+  return{total,discount,freeShip};
+}
+
+// ── Load Products ─────────────────────────────────────────
+async function loadProducts(){
+  try{
+    const snap=await db.ref('products').get();
+    const products=objToArray(snap.val()).sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    document.getElementById('products-count').textContent=products.length+' منتج';
+    renderProducts(products);
+  }catch(err){
+    console.error(err);
+    document.getElementById('products-grid').innerHTML='<div style="grid-column:1/-1" class="empty-state"><div class="empty-state-icon">⚠️</div><h3>فيه مشكلة</h3><p>مقدرناش نحمل المنتجات، حاول تاني</p></div>';
+    document.getElementById('products-count').textContent='—';
+  }finally{
+    setTimeout(()=>document.getElementById('loading-screen').classList.add('hidden'),500);
+  }
+}
+
+function renderProducts(products){
+  const grid=document.getElementById('products-grid');
+  if(!products.length){grid.innerHTML='<div style="grid-column:1/-1" class="empty-state"><div class="empty-state-icon">🚗</div><h3>مفيش منتجات لسه</h3><p>ارجع قريباً</p></div>';return}
+  grid.innerHTML=products.map((p,i)=>`
+    <div class="product-card" style="animation:fadeUp .45s ease ${i*0.08}s both">
+      <div class="product-img-wrap">
+        ${p.imageUrl?`<img class="product-img" src="${esc(p.imageUrl)}" alt="${esc(p.name)}" loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'product-img-placeholder\\'>🚗</div>'">`:`<div class="product-img-placeholder">🚗</div>`}
+      </div>
+      <div class="product-body">
+        <div class="product-name">${esc(p.name)}</div>
+        ${p.description?`<div class="product-desc">${esc(p.description)}</div>`:''}
+        <div class="product-footer">
+          <div class="product-price">${Number(p.price).toLocaleString('ar-EG')}<small>EGP</small></div>
+          <button class="add-to-cart-btn" id="atc-${p.id}"
+            data-id="${esc(String(p.id))}"
+            data-name="${esc(p.name)}"
+            data-price="${Number(p.price)}"
+            data-img="${esc(p.imageUrl||'')}"
+            onclick="addToCartFromBtn(this)">+ أضف للسلة</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ── Cart ──────────────────────────────────────────────────
+function addToCartFromBtn(btn){
+  addToCart({
+    id: btn.dataset.id,
+    name: btn.dataset.name,
+    price: Number(btn.dataset.price),
+    imageUrl: btn.dataset.img
   });
-  if (id==='game') {
-    setTimeout(resizeCanvas,100);
+}
+function addToCart(product){
+  const ex=cart.find(i=>i.id===product.id);
+  if(ex)ex.qty++;else cart.push({...product,qty:1});
+  updateCartUI();
+  showToast(`✓ تمت إضافة "${product.name}"`);
+  const btn=document.getElementById(`atc-${product.id}`);
+  if(btn){btn.classList.add('added');btn.textContent='✓ في السلة';setTimeout(()=>{btn.classList.remove('added');btn.textContent='+ أضف للسلة'},1800)}
+  const cc=document.getElementById('cart-count');cc.classList.add('bump');setTimeout(()=>cc.classList.remove('bump'),300);
+}
+function removeFromCart(id){cart=cart.filter(i=>i.id!==id);updateCartUI();renderCartItems()}
+function changeQty(id,delta){const it=cart.find(i=>i.id===id);if(!it)return;it.qty+=delta;if(it.qty<=0)removeFromCart(id);else{updateCartUI();renderCartItems()}}
+function getCartTotal(){return cart.reduce((s,i)=>s+(i.price*i.qty),0)}
+function getCartCount(){return cart.reduce((s,i)=>s+i.qty,0)}
+function updateCartUI(){
+  const c=getCartCount();
+  document.getElementById('cart-count').textContent=c;
+  document.getElementById('cart-total').textContent=formatPrice(getCartTotal());
+  document.getElementById('cart-checkout-btn').disabled=cart.length===0;
+}
+function renderCartItems(){
+  const con=document.getElementById('cart-items-list');
+  if(!cart.length){con.innerHTML='<div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>السلة فاضية</p><p style="font-size:.8rem;margin-top:.25rem;color:var(--text-muted)">أضف منتجات من المتجر</p></div>';return}
+  con.innerHTML=cart.map(item=>`
+    <div class="cart-item">
+      ${item.imageUrl?`<img class="cart-item-img" src="${esc(item.imageUrl)}" alt="${esc(item.name)}" onerror="this.style.display='none'">`:`<div class="cart-item-img" style="display:flex;align-items:center;justify-content:center;font-size:2rem">🚗</div>`}
+      <div>
+        <div class="cart-item-name">${esc(item.name)}</div>
+        <div class="cart-item-price">${formatPrice(item.price*item.qty)}</div>
+        <div class="cart-qty">
+          <button class="qty-btn" onclick="changeQty('${item.id}',-1)">−</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}',1)">+</button>
+        </div>
+      </div>
+      <button class="remove-btn" onclick="removeFromCart('${item.id}')">🗑</button>
+    </div>`).join('');
+}
+function openCart(){renderCartItems();document.getElementById('cart-overlay').classList.add('open');document.getElementById('cart-drawer').classList.add('open')}
+function closeCart(){document.getElementById('cart-overlay').classList.remove('open');document.getElementById('cart-drawer').classList.remove('open')}
+
+// ── Checkout ──────────────────────────────────────────────
+function renderCheckoutSummary(){
+  document.getElementById('checkout-items').innerHTML=cart.map(item=>`<div class="order-summary-item"><span class="name">${esc(item.name)} × ${item.qty}</span><span class="price">${formatPrice(item.price*item.qty)}</span></div>`).join('');
+  const {total,discount,freeShip}=getFinalTotal();
+  if(discount>0){
+    document.getElementById('discount-row').style.display='flex';
+    document.getElementById('discount-pct').textContent=appliedPromo.discount;
+    document.getElementById('discount-val').textContent='- '+formatPrice(discount);
+  }else{
+    document.getElementById('discount-row').style.display='none';
+  }
+  document.getElementById('shipping-row').style.display=freeShip?'flex':'none';
+  document.getElementById('checkout-total').textContent=formatPrice(total);
+}
+
+async function placeOrder(){
+  const name=document.getElementById('c-name').value.trim();
+  const phone=document.getElementById('c-phone').value.trim();
+  const address=document.getElementById('c-address').value.trim();
+  const notes=document.getElementById('c-notes').value.trim();
+  let valid=true;
+  const chk=(fgId,cond)=>{if(!cond){document.getElementById(fgId).classList.add('has-error');valid=false}else document.getElementById(fgId).classList.remove('has-error')};
+  chk('fg-name',name.length>=2);
+  chk('fg-phone',/^01[0-9]{9}$/.test(phone));
+  chk('fg-address',address.length>=5);
+  if(!valid){showToast('من فضلك اتأكد من البيانات','error');return}
+  const btn=document.getElementById('place-order-btn');
+  btn.disabled=true;btn.textContent='جاري إرسال الطلب...';showSpinner();
+  try{
+    const {total,discount,freeShip}=getFinalTotal();
+    const orderData={
+      customerName:name,phone,address,notes,
+      items:cart.map(i=>({id:i.id,name:i.name,price:i.price,qty:i.qty})),
+      originalPrice:getCartTotal(),
+      totalPrice:total,
+      discount,
+      freeShipping:freeShip,
+      promoCode:appliedPromo?appliedPromo.code:null,
+      status:'pending',
+      paymentMethod:'cash_on_delivery',
+      createdAt:Date.now(),
+      userId:currentUser?currentUser.uid:null
+    };
+    const ref=await db.ref('orders').push(orderData);
+    cart=[];appliedPromo=null;updateCartUI();hideSpinner();showSuccess(ref.key);
+  }catch(err){
+    console.error(err);hideSpinner();showToast('حصل خطأ، حاول تاني','error');
+    btn.disabled=false;btn.textContent='✅ تأكيد الطلب';
   }
 }
 
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + type;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(()=>t.classList.remove('show'), 2800);
-}
-
-// Init
-showScreen('lobby');
+loadProducts();
+updateCartUI();
 </script>
 </body>
 </html>
